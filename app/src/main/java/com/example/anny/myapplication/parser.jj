@@ -1,0 +1,517 @@
+
+/* Copyright (c) 2006, Sun Microsystems, Inc.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ *     * Redistributions of source code must retain the above copyright notice,
+ *       this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the name of the Sun Microsystems, Inc. nor the names of its
+ *       contributors may be used to endorse or promote products derived from
+ *       this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+ * THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+ options {
+   LOOKAHEAD = 2;
+ }
+
+PARSER_BEGIN(JavaInterpreter)
+// =================================
+//        IMPORTS
+// =================================
+
+package com.example.anny.myapplication;
+
+import java.lang.*;
+import java.util.*;
+import java.lang.reflect.*;
+import java.io.*;
+import android.util.Log;
+import org.apache.commons.lang3.reflect.*;
+/** New line translator. */
+public class JavaInterpreter {
+
+  // =================================
+  //        INNER CLASSES
+  // =================================
+  static class Value{
+    public Class<?> clazz;
+    public Object value;
+    public boolean isArray;
+    public boolean isClass;
+
+    public Value(Class<?> clazz, Object value){
+      this.clazz = clazz;
+      this.value = value;
+      this.isArray = clazz.isArray();
+      this.isClass = value == null;
+    }
+
+    public String toString(){
+      return "class: " + clazz.toString() + ", value: " + (value != null ? value.toString() : "null");
+    }
+  }
+
+  static class MethodClass{
+    public String methodName;
+    public List<Value> params;
+
+    public MethodClass(String methodName, List<Value> params){
+      this.methodName = methodName;
+      this.params = params;
+    }
+  }
+
+  static class Invoke{
+    public String field;
+    public MethodClass method;
+
+    public Invoke(MethodClass m, String f){
+      field = f;
+      method = m;
+    }
+  }
+
+  // =================================
+  //        CLASS VARIABLES
+  // =================================
+  public static Map<String,Value> varibals = new HashMap<String,Value>();
+  public static JavaInterpreter parser;
+  public static String mypackage;
+
+  // =================================
+  //              MAIN
+  // =================================
+  public static void initialize(Object thisObj, String packagename){
+    Value thisVal = new Value(thisObj.getClass(), thisObj);
+    mypackage = packagename;
+    varibals.put("this", thisVal);
+    InputStream targetStream = new ByteArrayInputStream("".getBytes());
+    parser = new JavaInterpreter(targetStream );
+  }
+
+  public static void parseFunc(String s) throws ParseException {
+
+    InputStream targetStream = new ByteArrayInputStream(s.getBytes());
+    parser.ReInit(targetStream);
+    parser.Body();
+  }
+
+  // =================================
+  //        HELPER FUNCTIONS
+  // =================================
+  public static boolean doesVarExist(String var_name){
+    return varibals.containsKey(var_name);
+  }
+
+  public static Object getNewInstance(final Class<?> clazz, List<Value> constructorParameters) throws ParseException{
+    Class<?> [] parameterTypes = new Class[constructorParameters.size()];
+    Object [] parameters = new Object[constructorParameters.size()];
+    for(int i =  0; i < constructorParameters.size(); i++) {
+        parameterTypes[constructorParameters.size() - i - 1] = constructorParameters.get(i).clazz;
+        parameters[constructorParameters.size() - i - 1] = constructorParameters.get(i).value;
+    }
+    try{
+        //Constructor constructor = clazz.getConstructor(parameterTypes);
+        //return constructor.newInstance(parameters);
+        return ConstructorUtils.invokeConstructor(clazz, parameters);
+
+    }
+    catch(Exception e){
+        throw new ParseException("failed to create instance: " + e.getCause());
+    }
+  }
+
+  public static Value invokeStaticMethod(final Class<?> clazz, MethodClass m, Object o) throws ParseException{
+    List<Value> methodParameters = m.params;
+    Class<?> [] parameterTypes = new Class[methodParameters.size()];
+    Object [] parameters = new Object[methodParameters.size()];
+    for(int i =  0; i < methodParameters.size(); i++) {
+        parameterTypes[methodParameters.size() - i - 1] = methodParameters.get(i).clazz;
+        parameters[methodParameters.size() - i - 1] = methodParameters.get(i).value;
+        System.out.println("debug param : " + parameters[methodParameters.size() - i - 1]);
+        System.out.println("debug type : " + parameterTypes[methodParameters.size() - i - 1]);
+    }
+    try{
+      Object res = null;
+      if (o == null) {
+          res = MethodUtils.invokeStaticMethod(clazz, m.methodName, parameters);
+      }
+      else {
+          res = MethodUtils.invokeMethod(o, m.methodName, parameters);
+      }
+      if (res == null){
+        return null;
+      }
+      return new Value(res.getClass(), res);
+    }
+    catch(Exception e){
+        System.out.println("class "  + clazz.getSimpleName());
+        System.out.println("var "  + o);
+        System.out.println("method "  + m.methodName);
+        System.out.println("params "  + parameters);
+        for (Object p : parameters){
+          System.out.println("param " + p);
+        }
+        throw new ParseException("failed to invoke: \n" + e.getCause());
+    }
+  }
+
+  public static Class<?> checkClass(String className) throws ParseException{
+    List<String> packages = Arrays.asList(
+            mypackage + ".",
+            "java.lang.",
+            "java.util.",
+            "android.widget.",
+            "android.util.",
+            "android.app.",
+            "android.view.",
+            "android.content."
+    );
+    for (String pkg : packages){
+
+      Class<?> clazz = classExists(pkg + className);
+      if (clazz != null ){
+        return clazz;
+      }
+    }
+    throw new ParseException("symbol doesnt exist");
+
+  }
+
+  static Class<?> classExists(String fullClassName) {
+      try {
+          return Class.forName(fullClassName);
+      } catch (ClassNotFoundException e) {
+          return null;
+      }
+  }
+
+}
+
+PARSER_END(JavaInterpreter)
+
+SKIP :
+{
+  " "
+| "\t"
+| "\n"
+| "\r"
+}
+
+TOKEN :
+{
+  < INT_NUM: ( ["0"-"9"] )+ >
+|
+  < DOUBLE_NUM:  ( ["0"-"9"] )+ "." ( ["0"-"9"] )+ >
+|
+  < SC: ";" >
+|
+  < COMMA: "," >
+|
+  < LPARAM: "(" >
+|
+  < RPARAM: ")" >
+|
+  < LARRAY: "[" >
+|
+  < RARRAY: "]" >
+|
+  < ASSIGN: "=" >
+|
+  < NEW: "new" >
+|
+  < TRUE: "true" >
+|
+  < FALSE: "false" >
+|
+  < BOOL_T: "bool" >
+|
+  < INT_T: "int" >
+|
+  < DOUBLE_T: "double" >
+|
+  < STRING_T: "string" >
+|
+  < STRING: "\"" (["a"-"z","A"-"Z","_","0"-"9",".", " "])* "\"" > //TODO fix string
+|
+  < DOT: "." >
+|
+  < NAME: ["a"-"z","A"-"Z","_"] ( ["a"-"z","A"-"Z","_","0"-"9"] )* >
+}
+
+
+
+/** Top level production. */
+void Body() :
+{}
+{
+  (Statment() <SC> (Body())?)
+  <EOF>
+}
+
+String FieldInvoke():
+{
+  Token name = null;
+}
+{
+  (name = <NAME>)
+  {
+    return name.image;
+  }
+}
+
+List<Invoke> ListInvokes():
+{
+  Token f = null;
+  MethodClass m = null;
+  List<Invoke> l = null;
+}
+{
+  (<DOT> (m = MethodInvoke() | f = <NAME>) (l = ListInvokes())?)
+  {
+    if (l == null){
+      l = new ArrayList<Invoke>();
+    }
+    if (m != null){
+      l.add(0, new Invoke(m, null));
+    }
+    else {
+      l.add(0, new Invoke(null, f.image));
+    }
+    return l;
+  }
+}
+
+MethodClass MethodInvoke():
+{
+  List<Value> l = null;
+  Token name = null;
+}
+{
+  (name = <NAME> <LPARAM> (l = ParamList())? <RPARAM>)
+  {
+    if (l == null){
+      l = new ArrayList<Value>();
+    }
+    MethodClass m = new MethodClass(name.image, l);
+    return m;
+  }
+}
+
+// List<MethodClass> InvocList():
+// {
+//   List<MethodClass> invocations = null;
+//   List<Value> l = null;
+//   Token name = null;
+// }
+// {
+//   (name = <NAME> <LPARAM> (l = ParamList())? <RPARAM> (<DOT> invocations = InvocList())?)
+//   {
+//     if (l == null){
+//       l = new ArrayList<Value>();
+//     }
+//     MethodClass m = new MethodClass(name.image, l);
+//     if (invocations == null){
+//       invocations = new ArrayList<MethodClass>();
+//     }
+//     invocations.add(0, m);
+//     return invocations;
+//   }
+// }
+
+List<Value> ParamList():
+{
+  List<Value> l = null;
+  Value v = null;
+}
+{
+  (v = Param() (<COMMA> l = ParamList())?)
+  {
+    if (l == null){
+      l = new ArrayList<Value>();
+    }
+    l.add(v);
+    return l;
+  }
+}
+
+
+Value Param():
+{
+  Value v = null;
+}
+{
+  (v = Exp())
+  {
+    return v;
+  }
+}
+
+void Statment():
+{
+  Value v = null;
+  Token var_name = null;
+  Token assign = null;
+}
+{
+  ((var_name = <NAME> <ASSIGN>)? v = Exp() )
+  {
+    if (var_name != null){
+      varibals.put(var_name.image, v);
+      //DEBUG
+      System.out.println("all variables: " + varibals.toString());
+    }
+  }
+}
+
+Value Exp():
+{
+  Value v = null;
+  List<Invoke> l = null;
+}
+{
+  (v = SimpleExp() (l = ListInvokes())? ){
+    if (l != null){
+      for (Invoke i : l){
+        if (i.method != null){
+          v = invokeStaticMethod(v.clazz, i.method, v.value);
+        }
+        else {
+          try{
+            Field f = v.clazz.getField(i.field);
+            v = new Value(f.getType(), f.get(v.value));
+          }
+          catch (Exception e){
+            Class<?>[] inners = v.clazz.getDeclaredClasses();
+            boolean flag = false;
+            for (Class<?> inner : inners){
+              if (inner.getSimpleName().equals(i.field)){
+                v = new Value(inner, null);
+                flag = true;
+                break;
+              }
+            }
+            if (!flag){
+                throw new ParseException("no such symbol: " + i.field);
+            }
+          }
+        }
+      }
+    }
+    return v;
+  }
+}
+
+Value SimpleExp():
+{
+  Token class_name = null;
+  Token value = null;
+  Value v = null;
+  Class<?> clazz = null;
+  List<Value> l = null;
+  Token var_name = null;
+  Token field = null;
+  Token size_arr = null;
+  MethodClass m = null;
+  String f = null;
+}
+{
+  (
+  (var_name = <NAME>) {
+    //case: variable or regular class
+
+
+    try{
+      Class<?> clazz1 = checkClass(var_name.image);
+      v = new Value(clazz1, null);
+    }
+    catch(Exception e){
+      if (doesVarExist(var_name.image)){
+        v = varibals.get(var_name.image);
+      }
+      else {
+        throw new ParseException("symbol " + var_name.image + " doesnt exist");
+      }
+    }
+
+  }|
+  <NEW>
+  (class_name = <NAME>)
+  ((<LPARAM> ( l = ParamList())? <RPARAM>) | (<LARRAY> size_arr = <INT_NUM> <RARRAY>)) {
+    //get class:
+    //case: regular class
+    clazz = checkClass(class_name.image);
+
+    if (clazz != null){
+      //case: array
+      if (size_arr != null){
+        try{
+          int size = Integer.parseInt(size_arr.image);
+          if (size <= 0){
+            throw new ParseException("invalid size");
+          }
+          Object arr = Array.newInstance(clazz, size);
+          v = new Value(arr.getClass(), arr);
+        }
+        catch(NumberFormatException e){
+          throw new ParseException("invalid size");
+        }
+      }
+      //case: constructor
+      else{
+        if (l == null){
+          try{
+            Object val = clazz.newInstance();
+            v = new Value(clazz, val);
+            return v;
+          }
+          catch(Exception e){
+            throw new ParseException("failed to create value no params");
+          }
+        }
+        try{
+          Object val = getNewInstance(clazz, l);
+          v = new Value(clazz, val);
+        }
+        catch(Exception e){
+          throw new ParseException("failed to create value");
+        }
+      }
+    }
+  }|
+  value = <INT_NUM> {
+    v = new Value(int.class, Integer.valueOf(value.image));
+  } |
+  value = <DOUBLE_NUM> {
+    v = new Value(double.class, Double.valueOf(value.image));
+  } |
+  value = <STRING> {
+    v = new Value(String.class, value.image.substring(1,value.image.length()-1));
+  } |
+  <TRUE> {
+    v = new Value(boolean.class, Boolean.TRUE);
+  } |
+  <FALSE> {
+    v = new Value(boolean.class, Boolean.FALSE);
+  })
+  {
+    return v;
+  }
+}

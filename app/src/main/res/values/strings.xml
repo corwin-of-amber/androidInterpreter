@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">My Application</string>
+    <string name="code_example">this.findViewById(R.id.button).setTextColor(this.getResources().getColor(R.color.colorAccent));
+        \nToast.makeText(this, \"yay\", Toast.LENGTH_LONG).show();</string>
+</resources>

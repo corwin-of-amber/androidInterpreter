@@ -11,7 +11,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        new Thread((new com.example.anny.myapplication.JavaHTTPServer()).start());
+        // open the server
+        myThread myThread = new myThread();
+        myThread.start();
 
         setContentView(R.layout.activity_main);
         JavaInterpreter.initialize(this, getPackageName());

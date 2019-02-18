@@ -1,5 +1,9 @@
 package com.example.anny.myapplication;
 
+import android.annotation.TargetApi;
+import android.os.Build;
+import android.util.Log;
+
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
@@ -9,21 +13,20 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Date;
 import java.util.StringTokenizer;
 
+import static com.example.anny.myapplication.myThread.verbose;
+
 public class JavaHTTPServer implements Runnable{
+
     static final File WEB_ROOT = new File(".");
     static final String DEFAULT_FILE = "index.html";
     static final String FILE_NOT_FOUND = "404.html";
     static final String METHOD_NOT_SUPPORTED = "not_supported.html";
-    // port to listen connection
-    static final int PORT = 8080;
-
-    // verbose mode
-    static final boolean verbose = true;
 
     // Client Connection via Socket Class
     private Socket connect;
@@ -32,31 +35,10 @@ public class JavaHTTPServer implements Runnable{
         connect = c;
     }
 
-    public static void main(String[] args) {
-        try {
-            ServerSocket serverConnect = new ServerSocket(PORT);
-            System.out.println("Server started.\nListening for connections on port : " + PORT + " ...\n");
-
-            // we listen until user halts server execution
-            while (true) {
-                JavaHTTPServer myServer = new JavaHTTPServer(serverConnect.accept());
-
-                if (verbose) {
-                    System.out.println("Connecton opened. (" + new Date() + ")");
-                }
-
-                // create dedicated thread to manage the client connection
-                Thread thread = new Thread(myServer);
-                thread.start();
-            }
-
-        } catch (IOException e) {
-            System.err.println("Server Connection error : " + e.getMessage());
-        }
-    }
-
+    @TargetApi(Build.VERSION_CODES.O)
     @Override
     public void run() {
+        Log.d("server","attached client");
         // we manage our particular client connection
         BufferedReader in = null; PrintWriter out = null; BufferedOutputStream dataOut = null;
         String fileRequested = null;
@@ -76,7 +58,7 @@ public class JavaHTTPServer implements Runnable{
             String method = parse.nextToken().toUpperCase(); // we get the HTTP method of the client
             // we get file requested
             fileRequested = parse.nextToken().toLowerCase();
-
+            Log.d("===================",":)=====================");
             // we support only GET and HEAD methods, we check
             if (!method.equals("GET")  &&  !method.equals("HEAD")) {
                 if (verbose) {
@@ -103,10 +85,15 @@ public class JavaHTTPServer implements Runnable{
                 dataOut.flush();
 
             } else {
+                Path path = Paths.get(".");
                 // GET or HEAD method
                 if (fileRequested.endsWith("/")) {
+                    Log.d("server1",fileRequested);
                     fileRequested += DEFAULT_FILE;
                 }
+                Log.d("server2",System.getProperty("user.dir"));
+                Log.d("server3",fileRequested);
+                Log.d("server4",path.toAbsolutePath().toString());
 
                 File file = new File(WEB_ROOT, fileRequested);
                 int fileLength = (int) file.length();
@@ -163,6 +150,8 @@ public class JavaHTTPServer implements Runnable{
 
     private byte[] readFileData(File file, int fileLength) throws IOException {
         FileInputStream fileIn = null;
+        byte[] fileData = "<h1>hello world!</h1>".getBytes();
+        /*
         byte[] fileData = new byte[fileLength];
 
         try {
@@ -172,6 +161,7 @@ public class JavaHTTPServer implements Runnable{
             if (fileIn != null)
                 fileIn.close();
         }
+        */
 
         return fileData;
     }

@@ -45,6 +45,11 @@
             </div>
         </div>
         <script type="text/javascript">
+		window.addEventListener("keydown",
+		function(e){
+			if([37,38,39,40].indexOf(e.keyCode) > -1)
+				e.preventDefault();
+		},false);
 		var cursor = $("#cursor");
 		var setter = $("#setter");
 		var writer = $("#writer");
@@ -57,19 +62,13 @@
 			'<font color="cyan" style="font-family: cursor, courier;font-weight: bold;"> \> </font>');
 		}
 		function writeit(from, e){
+			if(e.originalEvent.key == "Enter"){
+				console.log(from.value.substring(from.value.lastIndexOf('\n')));
+			}
 			e = e || window.event;
 			var w = $(writer);
 			var tw = from.value;
 			w.html(nl2br(tw));
-		}
-		function moveIt(count, e){
-			e = e || window.event;
-			var keycode = e.keyCode || e.which;
-			if(keycode == 37 && parseInt($(cursor).css("left")) >= (0-((count-1)*10))){
-				$(cursor).css("left", parseInt($(cursor).css("left")) - 10 + "px");
-			} else if(keycode == 39 && (parseInt($(cursor).css("left")) + 10) <= 0){
-				$(cursor).css("left", parseInt($(cursor).css("left")) + 10 + "px");
-			}
 		}
         function blink(){
             if($(cursor).css("display") == "none"){
@@ -82,13 +81,6 @@
         $(terminal).click(function(){
         	$(setter).focus();
         });
-        $(setter).keydown(function(event){
-			writeit(this, event);
-			moveIt(this.value.length, event);
-		});
-		$(setter).keyup(function(event){
-			writeit(this, event);
-		});
 		$(setter).keypress(function(event){
 			writeit(this, event);
 		});

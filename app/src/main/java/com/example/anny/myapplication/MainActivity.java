@@ -1,5 +1,6 @@
 package com.example.anny.myapplication;
 
+import android.content.Context;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -10,9 +11,12 @@ import android.widget.EditText;
 import com.example.anny.myapplication.server.myThread2;
 
 public class MainActivity extends AppCompatActivity {
+    public static Context mContext;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mContext = this;
         // open the MyServer
         Thread thread = new myThread2();
         thread.start();

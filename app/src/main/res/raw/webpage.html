@@ -45,16 +45,33 @@
             </div>
         </div>
         <script type="text/javascript">
-		window.addEventListener("keydown",
-		function(e){
-			if([37,38,39,40].indexOf(e.keyCode) > -1)
-				e.preventDefault();
-		},false);
-		var cursor = $("#cursor");
+        var cursor = $("#cursor");
 		var setter = $("#setter");
 		var writer = $("#writer");
 		var terminal = $("#terminal");
+		window.addEventListener("keydown",
+		function(e){
+		    if ([8].indexOf(e.keyCode) > -1 && setter[0].value[setter[0].value.length-1] == "\n")
+    		    e.preventDefault();
+			if([37,38,39,40].indexOf(e.keyCode) > -1)
+				e.preventDefault();
+		},false);
+
 		$(cursor).css("left", "0px");
+		function runscript(code){
+		    var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    console.log(writer);
+                    setter[0].value = setter[0].value.substring(0, setter[0].value.length - 1) + '<br>';
+                    setter[0].value +=  this.responseText;
+                    writer.html(nl2br(setter[0].value));
+                }
+            };
+            xhttp.open("GET", "?code=" + code, true);
+            xhttp.send();
+		}
+
 		function nl2br(txt){
 			return txt.replace(/\n/g, '<br />'+
 			'<font color="#00c500" style="font-family: cursor, courier;font-weight: bold;">android@phone</font>'+
@@ -63,7 +80,19 @@
 		}
 		function writeit(from, e){
 			if(e.originalEvent.key == "Enter"){
-				console.log(from.value.substring(from.value.lastIndexOf('\n')));
+			    enter_pos = from.value.length - 1;
+			    console.log("enter pos is " + enter_pos);
+			    all_code = from.value.substring(0, enter_pos)
+			    console.log("all code is:");
+			    console.log(all_code);
+			    console.log("----END----");
+			    new_code_start = all_code.lastIndexOf('\n') + 1;
+			    console.log("new code pos is " + new_code_start);
+			    new_code = all_code.substring(new_code_start)
+			    console.log("new code is:");
+			    console.log(new_code);
+			    console.log("----END----");
+			    runscript(new_code)
 			}
 			e = e || window.event;
 			var w = $(writer);
@@ -81,7 +110,7 @@
         $(terminal).click(function(){
         	$(setter).focus();
         });
-		$(setter).keypress(function(event){
+		$(setter).keyup(function(event){
 			writeit(this, event);
 		});
 	</script>

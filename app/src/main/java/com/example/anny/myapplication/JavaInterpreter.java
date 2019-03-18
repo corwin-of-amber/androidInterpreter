@@ -140,7 +140,7 @@ public class JavaInterpreter implements JavaInterpreterConstants {
     }
   }
 
-  public static Class<?> checkClass(String className) throws ParseException{
+  public static Class<?> checkClass(Token className) throws ParseException{
     List<String> packages = Arrays.asList(
             mypackage + ".",
             "java.lang.",
@@ -153,12 +153,12 @@ public class JavaInterpreter implements JavaInterpreterConstants {
     );
     for (String pkg : packages){
 
-      Class<?> clazz = classExists(pkg + className);
+      Class<?> clazz = classExists(pkg + className.image);
       if (clazz != null ){
         return clazz;
       }
     }
-    throw new ParseException("symbol doesnt exist");
+    throw new ParseException("Encountered \"" + className.image + "\" at column " + className.beginColumn + " \nsymbol doesnt exist");
 
   }
 
@@ -332,7 +332,10 @@ public class JavaInterpreter implements JavaInterpreterConstants {
               }
             }
             if (!flag){
-                {if (true) throw new ParseException("no such symbol: " + i.field);}
+                {
+                  if (true)
+                    throw new ParseException("no such symbol: " + i.field);
+                }
             }
           }
         }
@@ -359,7 +362,7 @@ public class JavaInterpreter implements JavaInterpreterConstants {
 
 
     try{
-      Class<?> clazz1 = checkClass(var_name.image);
+      Class<?> clazz1 = checkClass(var_name);
       v = new Value(clazz1, null);
     }
     catch(Exception e){
@@ -367,7 +370,10 @@ public class JavaInterpreter implements JavaInterpreterConstants {
         v = varibals.get(var_name.image);
       }
       else {
-        {if (true) throw new ParseException("symbol " + var_name.image + " doesnt exist");}
+        {if (true)
+          throw new ParseException("Encountered \"" + var_name.image + "\" at column " + var_name.beginColumn + " \nsymbol doesnt exist");
+        }
+
       }
     }
     } else if (jj_2_13(2)) {
@@ -391,7 +397,7 @@ public class JavaInterpreter implements JavaInterpreterConstants {
       }
     //get class:
     //case: regular class
-    clazz = checkClass(class_name.image);
+    clazz = checkClass(class_name);
 
     if (clazz != null){
       //case: array

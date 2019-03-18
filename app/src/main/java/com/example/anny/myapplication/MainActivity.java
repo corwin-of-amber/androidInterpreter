@@ -1,5 +1,6 @@
 package com.example.anny.myapplication;
 
+import android.app.Activity;
 import android.content.Context;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -11,7 +12,7 @@ import android.widget.EditText;
 import com.example.anny.myapplication.server.myThread2;
 
 public class MainActivity extends AppCompatActivity {
-    public static Context mContext;
+    public static MainActivity mContext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

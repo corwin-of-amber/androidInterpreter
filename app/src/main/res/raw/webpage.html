@@ -94,10 +94,12 @@
 			    console.log("----END----");
 			    runscript(new_code)
 			}
+			else{
 			e = e || window.event;
 			var w = $(writer);
 			var tw = from.value;
 			w.html(nl2br(tw));
+			}
 		}
         function blink(){
             if($(cursor).css("display") == "none"){

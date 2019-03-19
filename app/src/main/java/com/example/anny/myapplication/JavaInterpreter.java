@@ -158,7 +158,7 @@ public class JavaInterpreter implements JavaInterpreterConstants {
         return clazz;
       }
     }
-    throw new ParseException("Encountered \"" + className.image + "\" at column " + className.beginColumn + " \nsymbol doesnt exist");
+    throw new ParseException("Encountered \"" + className.image + "\" at column " + className.beginColumn + ".\nsymbol doesnt exist");
 
   }
 
@@ -239,26 +239,6 @@ public class JavaInterpreter implements JavaInterpreterConstants {
     throw new Error("Missing return statement in function");
   }
 
-// List<MethodClass> InvocList():
-// {
-//   List<MethodClass> invocations = null;
-//   List<Value> l = null;
-//   Token name = null;
-// }
-// {
-//   (name = <NAME> <LPARAM> (l = ParamList())? <RPARAM> (<DOT> invocations = InvocList())?)
-//   {
-//     if (l == null){
-//       l = new ArrayList<Value>();
-//     }
-//     MethodClass m = new MethodClass(name.image, l);
-//     if (invocations == null){
-//       invocations = new ArrayList<MethodClass>();
-//     }
-//     invocations.add(0, m);
-//     return invocations;
-//   }
-// }
   static final public List<Value> ParamList() throws ParseException {
   List<Value> l = null;
   Value v = null;
@@ -371,7 +351,7 @@ public class JavaInterpreter implements JavaInterpreterConstants {
       }
       else {
         {if (true)
-          throw new ParseException("Encountered \"" + var_name.image + "\" at column " + var_name.beginColumn + " \nsymbol doesnt exist");
+          throw new ParseException("Encountered \"" + var_name.image + "\" at column " + var_name.beginColumn + ".\nsymbol doesnt exist");
         }
 
       }

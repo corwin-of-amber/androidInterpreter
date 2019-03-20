@@ -59,7 +59,6 @@ public class MyServer extends NanoHTTPD{
             final String [] ans = new String [1];
             ans[0] = "\n";
             final CountDownLatch cd = new CountDownLatch(1);
-            Looper l = Looper.myLooper();
             Thread mythread = new Thread() {
                 public void run() {
                     Looper.prepare();

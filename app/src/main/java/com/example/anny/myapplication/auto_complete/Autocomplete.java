@@ -5,20 +5,22 @@ import com.example.anny.myapplication.JavaInterpreter;
 import com.example.anny.myapplication.ParseException;
 import com.example.anny.myapplication.Token;
 
-import org.reflections.Reflections;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 public class Autocomplete {
-    List<TypeData> types= new ArrayList<>();
-    static boolean bad_code = false;
+    // ==================================
+    //          CLASS VARIABLES
+    // ==================================
+    private List<TypeData> types= new ArrayList<>();
+    public static boolean bad_code = false;
 
-    protected Class<?> isLiteral(String s){
+    // ==================================
+    //         PRIVATE FUNCTIONS
+    // ==================================
+    private Class<?> isLiteral(String s){
         if(s.matches("(true)|(false)"))
             return types.get(0).expression.push(Boolean.class);
         if(s.matches("\\d+(e\\d+)?"))
@@ -30,10 +32,67 @@ public class Autocomplete {
         return null;
     }
 
+    private boolean check_params(Class<?>[] expected, Class<?>[] actual){
+        if (expected.length != actual.length){
+            return false;
+        }
 
+        for (int i = 0; i < expected.length; i++){
+            if (!expected[i].isAssignableFrom(actual[i])){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private Method get_method(Class<?> clazz, String func_name, Class<?>[] args) throws NoSuchMethodException{
+        if (clazz == null){
+            return null;
+        }
+        Method[] methods = clazz.getMethods();
+        for (Method method : methods) {
+            if (method.getName().equals(func_name) && check_params(method.getParameterTypes(), args)){
+                return method;
+            }
+        }
+        throw new NoSuchMethodException();
+    }
+
+    private void printStack(){
+        Log.d("fetch", "====================PRINTING STACK==============================");
+        Log.d("fetch", "====== the stack is : (" + String.valueOf(types.size()) + ") =======");
+        for(int i = 0; i< types.size(); i ++){
+            Log.d("fetch", "i = " + String.valueOf(i)+ ", size of stack : " + String.valueOf(types.get(i).expression.size()));
+            Log.d("fetch", "type is : ");
+            try {
+                Log.d("fetch", types.get(i).getType().getSimpleName());
+            }
+            catch(Exception e){
+                Log.d("fetch", " null ");
+            }
+        }
+        Log.d("fetch","====================================");
+    }
+
+    private void reopen_func(){
+        Log.d("fetch", "before removing length of first stack "+ String.valueOf(types.get(0).expression.size()));
+        Log.d("fetch","removing "+types.get(0).expression.peek());
+        types.get(0).expression.pop(); // return value is unknown
+        for(TypeData td : types.get(0).arguments){
+            Log.d("fetch","adding to stack again " + td.getType().getSimpleName());
+            types.add(0, td);
+        }
+        types.get(0).arguments.clear();
+    }
+
+    //              CTOR
     public Autocomplete(){
         types.add(new TypeData());
     }
+
+    // ==================================
+    //           FUNCTIONS
+    // ==================================
     // will be called when there is a '.' in line:
     public Class<?> add_type(String s){
         try {
@@ -101,35 +160,6 @@ public class Autocomplete {
 
     }
 
-
-    private boolean check_params(Class<?>[] expected, Class<?>[] actual){
-        if (expected.length != actual.length){
-            return false;
-        }
-
-        for (int i = 0; i < expected.length; i++){
-            if (!expected[i].isAssignableFrom(actual[i])){
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private Method get_method(Class<?> clazz, String func_name, Class<?>[] args) throws NoSuchMethodException{
-        if (clazz == null){
-            return null;
-        }
-        Method[] methods = clazz.getMethods();
-        for (Method method : methods) {
-            if (method.getName().equals(func_name) && check_params(method.getParameterTypes(), args)){
-                return method;
-            }
-        }
-        throw new NoSuchMethodException();
-    }
-
-
-
     /* will be called when there is a:
     * ';'
     * '(' - only open new stack
@@ -151,48 +181,17 @@ public class Autocomplete {
         types.add(new TypeData());
     }
 
-
-
-    private void printStack(){
-        Log.d("fetch", "====================PRINTING STACK==============================");
-        Log.d("fetch", "====== the stack is : (" + String.valueOf(types.size()) + ") =======");
-        for(int i = 0; i< types.size(); i ++){
-            Log.d("fetch", "i = " + String.valueOf(i)+ ", size of stack : " + String.valueOf(types.get(i).expression.size()));
-            Log.d("fetch", "type is : ");
-            try {
-                Log.d("fetch", types.get(i).getType().getSimpleName());
-            }
-            catch(Exception e){
-                Log.d("fetch", " null ");
-            }
-        }
-        Log.d("fetch","====================================");
-    }
-
     public List<String> DoAutoComplete(String s){
         Log.d("fetch", "IN AUTO COMPLETE trying to complete -> "+s);
 
         List<String> result = new ArrayList<>();
-        // check if already has previous type
-        Class<?> relevant_class = null;
         assert(types.size() >= 1);
-        if(types.get(0).expression.size() > 0){
-            relevant_class = types.get(0).getType();
-        }
-//        try {
-//            Log.d("fetch", "size of types "+types.size());
-//            Log.d("fetch","size of stack : " + String.valueOf(types.get(0).expression.size()));
-//            relevant_class = types.get(0).getType();
-//            if(relevant_class != null){
-//                Log.d("fetch", "there is something in stack" + relevant_class.getSimpleName());
-//            }
-//        }
-//        catch(Exception e){ Log.d("fetch", e.getMessage());}
-        if(relevant_class == null){
+
+        if(types.get(0).expression.size() == 0){ // no known sub-type yet
             Log.d("fetch","in1");
             // already declared but never ran
             for (TypeData td : types) {
-                if (s == null || td.name.startsWith(s))
+                if (( td.expression.size() > 0 && !td.name.equals(""))  && (s == null || td.name.startsWith(s)))
                     result.add(td.name + "~" + td.getType());
             }
             // already declared and ran
@@ -201,24 +200,11 @@ public class Autocomplete {
                     result.add(var + "~" + JavaInterpreter.varibals.get(var).clazz);
                 }
             }
-
-            // check for existing classes in packages
-            for(String package_name: JavaInterpreter.packages){
-                package_name = package_name.substring(0, package_name.length() - 1);
-                Log.d("fetch","iterating over package "+package_name);
-                Reflections reflections = new Reflections(package_name);
-                Set<Class<? extends Object>> allClasses = reflections.getSubTypesOf(Object.class);
-                Log.d("fetch","============ printing classes ("+String.valueOf(allClasses.size())+") ================");
-                for(Class<?> clazz : allClasses){
-                    Log.d("fetch", clazz.getSimpleName());
-                    if(s == null || clazz.getSimpleName().startsWith(s)){
-                        result.add(clazz.getSimpleName() + "~" + package_name);
-                    }
-                }
-            }
-
+            // some class name if I would know how to check it
+            // TODO : Return all classes in package
         }
         else {
+            Class<?> relevant_class = types.get(0).getType();
             Field[] all_fields = relevant_class.getFields();
             Method[] all_methods = relevant_class.getMethods();
             for (Field f : all_fields) {
@@ -228,27 +214,24 @@ public class Autocomplete {
             for (Method m : all_methods) {
                 if (s == null || m.getName().startsWith(s)) {
                     String method = m.getName() + "(";
+                    int num_parms = 0;
                     for (Class<?> type : m.getParameterTypes()) {
+                        num_parms ++;
                         method += type.getSimpleName() + ",";
                     }
-                    method = method.substring(0, method.length() - 1);
+                    if(num_parms > 0)
+                        method = method.substring(0, method.length() - 1);
                     method += ") -> " + m.getReturnType();
                     result.add(method);
                 }
             }
         }
-        return result;
-    }
 
-    private void reopen_func(){
-        Log.d("fetch", "before removing length of first stack "+ String.valueOf(types.get(0).expression.size()));
-        Log.d("fetch","removing "+types.get(0).expression.peek());
-        types.get(0).expression.pop(); // return value is unknown
-        for(TypeData td : types.get(0).arguments){
-            Log.d("fetch","adding to stack again " + td.getType().getSimpleName());
-            types.add(0, td);
+        if(result.size() == 0) //didn't find anything
+        {
+            result.add("No results found.");
         }
-        types.get(0).arguments.clear();
+        return result ;
     }
 
     public void delete_char(char removed_character){
@@ -265,4 +248,7 @@ public class Autocomplete {
 
     }
 
+    public static boolean isBad_code() {
+        return bad_code;
+    }
 }

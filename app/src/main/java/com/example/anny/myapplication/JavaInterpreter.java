@@ -17,7 +17,7 @@ public class JavaInterpreter implements JavaInterpreterConstants {
   // =================================
   //        INNER CLASSES
   // =================================
-  static class Value{
+  public static class Value{
     public Class<?> clazz;
     public Object value;
     public boolean isArray;
@@ -61,6 +61,7 @@ public class JavaInterpreter implements JavaInterpreterConstants {
   public static Map<String,Value> varibals = new HashMap<String,Value>();
   public static JavaInterpreter parser;
   public static String mypackage;
+  public static List<String> packages;
 
   // =================================
   //              MAIN
@@ -68,6 +69,16 @@ public class JavaInterpreter implements JavaInterpreterConstants {
   public static void initialize(Object thisObj, String packagename){
     Value thisVal = new Value(thisObj.getClass(), thisObj);
     mypackage = packagename;
+    packages = Arrays.asList(
+              mypackage + ".",
+              "java.lang.",
+              "java.util.",
+              "android.widget.",
+              "android.util.",
+              "android.app.",
+              "android.view.",
+              "android.content."
+      );
     varibals.put("this", thisVal);
     InputStream targetStream = new ByteArrayInputStream("".getBytes());
     parser = new JavaInterpreter(targetStream );
@@ -141,20 +152,11 @@ public class JavaInterpreter implements JavaInterpreterConstants {
   }
 
   public static Class<?> checkClass(Token className) throws ParseException{
-    List<String> packages = Arrays.asList(
-            mypackage + ".",
-            "java.lang.",
-            "java.util.",
-            "android.widget.",
-            "android.util.",
-            "android.app.",
-            "android.view.",
-            "android.content."
-    );
     for (String pkg : packages){
-
+      Log.d("fetch", " checking pck "+pkg);
       Class<?> clazz = classExists(pkg + className.image);
       if (clazz != null ){
+        Log.d("fetch"," found class in pckg :"+pkg);
         return clazz;
       }
     }

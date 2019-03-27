@@ -277,7 +277,7 @@ public class Autocomplete {
                 String simple_class_name = cname.substring(cname.lastIndexOf(".") + 1,cname.length());
                 String package_name = cname.substring(0,cname.lastIndexOf("."));
                 if(simple_class_name.startsWith(s))
-                    result.add(package_name + "~" + simple_class_name);
+                    result.add(simple_class_name + "~" + package_name);
             }
         }
         else {

@@ -72,11 +72,13 @@ public class MyServer extends NanoHTTPD{
             }
             else if(parms.get("removed_char") != null)
                 autocompleteManager.delete_char(parms.get("removed_char").charAt(0));
-            else if(parms.get("function") != null)
-                autocompleteManager.func_handler(Integer.parseInt(parms.get("nargs")), parms.get("function"));
+            else if(parms.get("function") != null){
+                String nargs_value = parms.get("nargs");
+                nargs_value = (nargs_value == null) ? "0" : nargs_value;
+                autocompleteManager.func_handler(Integer.parseInt(nargs_value), parms.get("function"));
+            }
             else if(parms.get("token") != null) {
                 if(parms.get("new_stack") != null) {
-                    Log.d("fetch", "new_stack is true");
                     autocompleteManager.new_command(parms.get("token"), parms.get("varname"));
                 }
                 else{

@@ -152,11 +152,12 @@ public class JavaInterpreter implements JavaInterpreterConstants {
   }
 
   public static Class<?> checkClass(Token className) throws ParseException{
+    Log.d("fetch","searching for class name "+className.image);
     for (String pkg : packages){
       Log.d("fetch", " checking pck "+pkg);
       Class<?> clazz = classExists(pkg + className.image);
       if (clazz != null ){
-        Log.d("fetch"," found class in pckg :"+pkg);
+        Log.d("fetch"," found class in pckg :"+pkg + clazz.getSimpleName());
         return clazz;
       }
     }

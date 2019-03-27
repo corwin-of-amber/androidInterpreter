@@ -242,12 +242,14 @@ public class Autocomplete {
     }
 
     public void clear(){
+        Log.d("fetch","CLEARNINGGINGNGGINGIGN");
         types.clear();
         types.add(new TypeData());
     }
 
     public List<String> DoAutoComplete(String s){
         Log.d("fetch", "IN AUTO COMPLETE trying to complete -> "+s);
+        printStack();
         if (s == null){
             s = "";
         }

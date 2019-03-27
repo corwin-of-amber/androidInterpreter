@@ -199,6 +199,9 @@
         }
 
 
+        last_piece = '';
+        var_name = undefined;
+
 		function runscript(code){
             httpCall({code: code}, function(response) {
                 console.log(writer);
@@ -225,6 +228,7 @@
                 firstIndex = choice.length;
             current = current.substring(0, lastIndex + 1 ).concat(choice.substring(0, firstIndex));
             setter[0].value = current;
+            last_piece = current;
             writer.html(nl2br(current));
         }
 
@@ -299,14 +303,12 @@
 			writeit(this, event);
 		});
 
-        last_piece = '';
-        var_name = undefined;
-
         $(setter).bind('input propertychange', function(e) {
             code_start = this.value.lastIndexOf('\n') + 1;
             new_code = this.value.substring(code_start);
 
             if (Math.abs(new_code.length - last_piece.length) != 1) {
+                console.log("================ CLEARING =====================");
                 httpCall({autocomplete: true, clear: true}, undefined);
                 var_name = undefined;
             }

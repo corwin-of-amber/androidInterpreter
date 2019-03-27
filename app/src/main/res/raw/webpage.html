@@ -216,15 +216,15 @@
 			'<font color="cyan" style="font-family: cursor, courier;font-weight: bold;"> \> </font>');
 		}
         function completeme(choice){
-            alert(choice);
             new_html = '<tr><td class="text-left">Click Tab for suggestions</td><td class="text-left"></td></tr>'
             $("#suggestions").html(new_html);
             current = setter[0].value;
-            console.log("original value current :"+ current);
             lastIndex =  Math.max(current.lastIndexOf('.'), current.lastIndexOf(','), current.lastIndexOf(';'), current.lastIndexOf('('));
-            console.log("last index is "+lastIndex);
-            firstIndex = choice.indexOf('(') + 1;
+            firstIndex = choice.indexOf('(');
+            if(firstIndex == -1)
+                firstIndex = choice.length;
             current = current.substring(0, lastIndex + 1 ).concat(choice.substring(0, firstIndex));
+            setter[0].value = current;
             writer.html(nl2br(current));
         }
 

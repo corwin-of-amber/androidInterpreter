@@ -142,6 +142,7 @@ public class Autocomplete {
     // ==================================
     // will be called when there is a '.' in line:
     public Class<?> add_type(String s){
+        printStack();
         Log.d("fetch","================== adding to stack "+s+"===================");
         try {
             if (types.get(0).isEmpty()) { // first appearance of dot
@@ -199,6 +200,7 @@ public class Autocomplete {
     // function handlers - will be called whenever there is ')' in line
     // assertion - the stacks contains params
     public void func_handler(int arg_num, String function_name) {
+        printStack();
         assert (!types.get(arg_num).isEmpty());
 //        Log.d("fetch"," in func_handler "+function_name+" arg_num = "+String.valueOf(arg_num));
         if(arg_num == 0){ // no argument one empty stack
@@ -231,6 +233,7 @@ public class Autocomplete {
     * ','
     in line: */
     public void new_command(String s, String var_name) {
+        printStack();
         Log.d("fetch","in new command with s "+s + " and var name " + var_name);
         if (s != null) // '('
         {
@@ -249,7 +252,7 @@ public class Autocomplete {
 
     public List<String> DoAutoComplete(String s){
         Log.d("fetch", "IN AUTO COMPLETE trying to complete -> "+s);
-        printStack();
+//        printStack();
         if (s == null){
             s = "";
         }

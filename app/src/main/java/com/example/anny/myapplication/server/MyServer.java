@@ -40,14 +40,62 @@ public class MyServer extends NanoHTTPD{
         autocompleteManager = new Autocomplete();
     }
 
+    public Response run_autocomplete(Map<String, String> parms){
+        // autocomplete stuff
+        String response = "";
+        if(parms.get("clear") != null) {
+            // case of \n
+            Log.d("fetch2", "clear");
+            autocompleteManager.clear();
+        }
+        else if(parms.get("fetch") != null)
+        {
+            // case of tab
+            Log.d("fetch2", "completeme");
+            List<String> result = autocompleteManager.DoAutoComplete(parms.get("token"));
+            for(String r : result) response += r + "\n";
+        }
+        else if(parms.get("removed_char") != null)
+            // case of backspace
+        {
+            Log.d("fetch2", "backspace");
+            autocompleteManager.delete_char(parms.get("removed_char").charAt(0));
+        }
+        else if(parms.get("function") != null){
+            // case of function -> ')' ?
+            Log.d("fetch2", "function");
+            String nargs_value = parms.get("nargs");
+            nargs_value = (nargs_value == null) ? "0" : nargs_value;
+            Log.d("fetch2", "args: " + nargs_value);
+            Log.d("fetch2", "function: " + parms.get("function"));
+            autocompleteManager.func_handler(Integer.parseInt(nargs_value), parms.get("function"));
+        }
+        else if(parms.get("token") != null) {
+            Log.d("fetch2", "token: " + parms.get("token"));
+            if(parms.get("new_stack") != null) {
+                Log.d("fetch2", "newstack");
+                autocompleteManager.new_command(parms.get("token"), parms.get("varname"));
+            }
+            else{
+                Log.d("fetch",">?>?>?>?");
+                Log.d("fetch2", "no newstack");
+                Class<?> result = autocompleteManager.add_type(parms.get("token"));
+                Log.d("fetch",result.getSimpleName());
+            }
+        }
+        return newFixedLengthResponse(response);
+    }
+
 
     @Override
     public Response serve(IHTTPSession session) {
+
         final MainActivity mc = MainActivity.mContext;
         final Map<String, String> parms = session.getParms();
         System.out.println("parms are " + parms);
 
         if (parms.get("code") == null && parms.get("autocomplete") == null) {
+            // just asking for the web page
             InputStream ins = mc.getResources().openRawResource(mc.getResources().getIdentifier("webpage", "raw", mc.getPackageName()));
             BufferedReader r = new BufferedReader(new InputStreamReader(ins));
             StringBuilder total = new StringBuilder();
@@ -60,62 +108,38 @@ public class MyServer extends NanoHTTPD{
             }
             return newFixedLengthResponse(total.toString()); // return web - page
         }
-        if(parms.get("autocomplete") != null){
-            String response = "";
-            if(parms.get("clear") != null) {
-                autocompleteManager.clear();
-            }
-            else if(parms.get("fetch") != null)
-            {
-                List<String> result = autocompleteManager.DoAutoComplete(parms.get("token"));
-                for(String r : result) response += r + "\n";
-            }
-            else if(parms.get("removed_char") != null)
-                autocompleteManager.delete_char(parms.get("removed_char").charAt(0));
-            else if(parms.get("function") != null){
-                String nargs_value = parms.get("nargs");
-                nargs_value = (nargs_value == null) ? "0" : nargs_value;
-                autocompleteManager.func_handler(Integer.parseInt(nargs_value), parms.get("function"));
-            }
-            else if(parms.get("token") != null) {
-                if(parms.get("new_stack") != null) {
-                    autocompleteManager.new_command(parms.get("token"), parms.get("varname"));
-                }
-                else{
-                    Log.d("fetch",">?>?>?>?");
-                    Class<?> result = autocompleteManager.add_type(parms.get("token"));
-                    Log.d("fetch",result.getSimpleName());
-                }
-            }
-            return newFixedLengthResponse(response);
+        if(parms.get("autocomplete") != null) {
+            return run_autocomplete(parms);
         }
         else {
-            final String [] ans = new String [1];
-            ans[0] = "\n";
-            final CountDownLatch cd = new CountDownLatch(1);
-            Thread mythread = new Thread() {
-                public void run() {
-                    Looper.prepare();
-                    try {
-                        JavaInterpreter.parseFunc(parms.get("code"));
-                        Log.d("code","successfuly done code ");
-                    } catch (ParseException e) {
-                        ans[0] = "<font color='red'>"  + e.getMessage().replaceAll("\n", "<br />");
-                        ans[0] += "</font>\n";
-                        Log.d("failed", e.getMessage());
-                    } finally {
-                        cd.countDown();
+                // asking to run code
+                final String[] ans = new String[1];
+                ans[0] = "\n";
+                final CountDownLatch cd = new CountDownLatch(1);
+                Thread mythread = new Thread() {
+                    public void run() {
+                        Looper.prepare();
+                        try {
+                            JavaInterpreter.parseFunc(parms.get("code"));
+                            Log.d("code", "successfuly done code ");
+                        } catch (ParseException e) {
+                            ans[0] = "<font color='red'>" + e.getMessage().replaceAll("\n", "<br />");
+                            ans[0] += "</font>\n";
+                            Log.d("failed", e.getMessage());
+                        } finally {
+                            cd.countDown();
+                        }
+                        Looper.loop();
                     }
-                    Looper.loop();
+                };
+                mythread.start();
+                try {
+                    cd.await();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
-            };
-            mythread.start();
-            try {
-                cd.await();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+                return newFixedLengthResponse(ans[0]);
             }
-            return newFixedLengthResponse(ans[0]);
         }
-    }
+
 }

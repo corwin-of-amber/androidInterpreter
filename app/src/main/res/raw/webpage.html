@@ -1,396 +1,439 @@
 <html>
-    <head>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
-        <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
-        <style type="text/css">
-                @import url(https://fonts.googleapis.com/css?family=Roboto:400,500,700,300,100);
+<head>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+  <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+  <style type="text/css">
+  @import url(https://fonts.googleapis.com/css?family=Roboto:400,500,700,300,100);
 
-                .table-fill {
-                  background: white;
-                  border-radius:3px;
-                  border-collapse: collapse;
-                  margin: auto;
-                  padding:5px;
-                  width: 100%;
-                  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
-                  animation: float 5s infinite;
-                }
+  .table-fill {
+    background: white;
+    border-radius:3px;
+    border-collapse: collapse;
+    margin: auto;
+    padding:5px;
+    width: 100%;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+    animation: float 5s infinite;
+  }
 
-                th {
-                  color:#D5DDE5;;
-                  background:#1b1e24;
-                  border-bottom:4px solid #9ea7af;
-                  border-right: 0px solid #343a45;
-                  font-size:23px;
-                  font-weight: 100;
-                  padding:24px;
-                  text-align:left;
-                  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
-                  vertical-align:middle;
-                }
-            th:first-child {
-              border-top-left-radius:3px;
-            }
+  th {
+    color:#D5DDE5;;
+    background:#1b1e24;
+    border-bottom:4px solid #9ea7af;
+    border-right: 0px solid #343a45;
+    font-size:23px;
+    font-weight: 100;
+    padding:24px;
+    text-align:left;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+    vertical-align:middle;
+  }
+  th:first-child {
+    border-top-left-radius:3px;
+  }
 
-            th:last-child {
-              border-top-right-radius:3px;
-              border-right:none;
-            }
+  th:last-child {
+    border-top-right-radius:3px;
+    border-right:none;
+  }
 
-            tr {
-              border-top: 1px solid #C1C3D1;
-              border-bottom-: 1px solid #C1C3D1;
-              color:#666B85;
-              font-size:16px;
-              font-weight:normal;
-              text-shadow: 0 1px 1px rgba(256, 256, 256, 0.1);
-            }
+  tr {
+    border-top: 1px solid #C1C3D1;
+    border-bottom-: 1px solid #C1C3D1;
+    color:#666B85;
+    font-size:16px;
+    font-weight:normal;
+    text-shadow: 0 1px 1px rgba(256, 256, 256, 0.1);
+  }
 
-            tr:hover td {
-              background:#4E5066;
-              color:#FFFFFF;
-              border-top: 1px solid #22262e;
-            }
+  tr:hover td {
+    background:#4E5066;
+    color:#FFFFFF;
+    border-top: 1px solid #22262e;
+  }
 
-            tr:first-child {
-              border-top:none;
-            }
+  tr:first-child {
+    border-top:none;
+  }
 
-            tr:last-child {
-              border-bottom:none;
-            }
+  tr:last-child {
+    border-bottom:none;
+  }
 
-            tr:nth-child(odd) td {
-              background:#EBEBEB;
-            }
+  tr:nth-child(odd) td {
+    background:#EBEBEB;
+  }
 
-            tr:nth-child(odd):hover td {
-              background:#4E5066;
-            }
+  tr:nth-child(odd):hover td {
+    background:#4E5066;
+  }
 
-            tr:last-child td:first-child {
-              border-bottom-left-radius:3px;
-            }
+  tr:last-child td:first-child {
+    border-bottom-left-radius:3px;
+  }
 
-            tr:last-child td:last-child {
-              border-bottom-right-radius:3px;
-            }
+  tr:last-child td:last-child {
+    border-bottom-right-radius:3px;
+  }
 
-            footer{
-                position: fixed;
-                bottom: 0px;
-                width: 100%
-            }
+  footer{
+    position: fixed;
+    bottom: 0px;
+    width: 100%
+  }
 
-            td {
-              background:#FFFFFF;
-              padding:20px;
-              text-align:left;
-              vertical-align:middle;
-              font-weight:300;
-              font-size:18px;
-              text-shadow: -1px -1px 1px rgba(0, 0, 0, 0.1);
-              border-right: 1px solid #C1C3D1;
-            }
+  td {
+    background:#FFFFFF;
+    padding:20px;
+    text-align:left;
+    vertical-align:middle;
+    font-weight:300;
+    font-size:18px;
+    text-shadow: -1px -1px 1px rgba(0, 0, 0, 0.1);
+    border-right: 1px solid #C1C3D1;
+  }
 
-            td:last-child {
-              border-right: 0px;
-            }
+  td:last-child {
+    border-right: 0px;
+  }
 
-            th.text-left {
-              text-align: left;
-            }
+  th.text-left {
+    text-align: left;
+  }
 
-            th.text-center {
-              text-align: center;
-            }
+  th.text-center {
+    text-align: center;
+  }
 
-            th.text-right {
-              text-align: right;
-            }
+  th.text-right {
+    text-align: right;
+  }
 
-            td.text-left {
-              text-align: left;
-            }
+  td.text-left {
+    text-align: left;
+  }
 
-            td.text-center {
-              text-align: center;
-            }
+  td.text-center {
+    text-align: center;
+  }
 
-            td.text-right {
-              text-align: right;
-            }
-			body {
-				margin: 0px;
-				padding: 0px;
-				height: 99%;
-				background-color: black;
-			}
-			textarea#setter  {
-				left: -1000px;
-				position: absolute;
-			}
-			.cursor {
-				font-size: 12px;
-				background-color: white;
-				color: white;
-				position: relative;
-			}
-			#terminal {
-				margin: 8px;
-				cursor: text;
-				height: 500px;
-				overflow: auto;
-			}
-			#writer {
-				font-family: cursor, courier;
-				color: white;
-			}
-	        #getter {
-	            margin: 5px;
-	        }
-		</style>
-    </head>
-    <body>
-        <div id="terminal">
-            <textarea type="text" id="setter"></textarea>
-            <div id="getter">
-                <font color="#00c500" style="font-family: cursor, courier;font-weight: bold;">android@phone</font>
-                <font color="white" style="font-family: cursor, courier;font-weight: bold;"> :</font>
-                <font color="cyan" style="font-family: cursor, courier;font-weight: bold;"> ></font>
-                <span id="writer"></span><b class="cursor" id="cursor">&nbsp</b>
-            </div>
-        </div>
-        <script type="text/javascript">
-        var cursor = $("#cursor");
-		var setter = $("#setter");
-		var writer = $("#writer");
-		var terminal = $("#terminal");
-		window.addEventListener("keydown",
-		function(e){
-		    if ([8].indexOf(e.keyCode) > -1 && setter[0].value[setter[0].value.length-1] == "\n")
-    		    e.preventDefault();
-			if([37,38,39,40,9].indexOf(e.keyCode) > -1)
-				e.preventDefault();
-		},false);
+  td.text-right {
+    text-align: right;
+  }
+  body {
+    margin: 0px;
+    padding: 0px;
+    height: 99%;
+    background-color: black;
+  }
+  textarea#setter  {
+    left: -1000px;
+    position: absolute;
+  }
+  .cursor {
+    font-size: 12px;
+    background-color: white;
+    color: white;
+    position: relative;
+  }
+  #terminal {
+    margin: 8px;
+    cursor: text;
+    height: 500px;
+    overflow: auto;
+  }
+  #writer {
+    font-family: cursor, courier;
+    color: white;
+  }
+  #getter {
+    margin: 5px;
+  }
+  </style>
+</head>
+<body>
+  <div id="terminal">
+    <textarea type="text" id="setter"></textarea>
+    <div id="getter">
+      <font color="#00c500" style="font-family: cursor, courier;font-weight: bold;">android@phone</font>
+      <font color="white" style="font-family: cursor, courier;font-weight: bold;"> :</font>
+      <font color="cyan" style="font-family: cursor, courier;font-weight: bold;"> ></font>
+      <span id="writer"></span><b class="cursor" id="cursor">&nbsp</b>
+    </div>
+  </div>
+  <script type="text/javascript">
+  var cursor = $("#cursor");
+  var setter = $("#setter");
+  var writer = $("#writer");
+  var terminal = $("#terminal");
+  window.addEventListener("keydown",
+  function(e){
+    //dont backspace enters
+    if ([8].indexOf(e.keyCode) > -1 && setter[0].value[setter[0].value.length-1] == "\n")
+    e.preventDefault();
+    //dont allow arrows
+    if([37,38,39,40,9].indexOf(e.keyCode) > -1)
+    e.preventDefault();
+  },false);
 
-		$(cursor).css("left", "0px");
 
-        function httpCall(params, callback){
-            var xhttp = new XMLHttpRequest();
-            xhttp.onreadystatechange = function() {
-                if (this.readyState == 4 && this.status == 200) {
-                    if(callback) callback(this);
-                }
-            };
+  $(cursor).css("left", "0px");
 
-            arguments = "";
-            for (var key in params) {
-                // check if the property/key is defined in the object itself, not in parent
-                if (params.hasOwnProperty(key) && params[key]) {
-                    arguments += "&" + key + "=" + params[key]
-                }
-            }
-            arguments = "?" + arguments.substring(1);
+  function httpCall(params, callback){
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        if(callback) callback(this);
+      }
+    };
 
-            console.log(arguments);
-            xhttp.open("GET", arguments, true);
-            xhttp.send();
+    arguments = "";
+    for (var key in params) {
+      // check if the property/key is defined in the object itself, not in parent
+      if (params.hasOwnProperty(key) && params[key]) {
+        arguments += "&" + key + "=" + params[key]
+      }
+    }
+    arguments = "?" + arguments.substring(1);
+
+    console.log(arguments);
+    xhttp.open("GET", arguments, false);
+    xhttp.send();
+  }
+
+
+  last_piece = '';
+  var_name = undefined;
+
+  function runscript(code){
+    httpCall({code: code}, function(response) {
+      console.log(writer);
+      setter[0].value = setter[0].value.substring(0, setter[0].value.length - 1) + '<br>';
+      console.log(response);
+      setter[0].value +=  response.responseText;
+      writer.html(nl2br(setter[0].value));
+    })
+  }
+
+  function nl2br(txt){
+    return txt.replace(/\n/g, '<br />'+
+    '<font color="#00c500" style="font-family: cursor, courier;font-weight: bold;">android@phone</font>'+
+    '<font color="white" style="font-family: cursor, courier;font-weight: bold;"> :</font>'+
+    '<font color="cyan" style="font-family: cursor, courier;font-weight: bold;"> \> </font>');
+  }
+  function completeme(choice){
+    //write suggestions
+    new_html = '<tr><td class="text-left">Click Tab for suggestions</td><td class="text-left"></td></tr>'
+    $("#suggestions").html(new_html);
+    current = setter[0].value;
+    lastIndex =  Math.max(current.lastIndexOf('.'), current.lastIndexOf(','), current.lastIndexOf(';'), current.lastIndexOf('('), current.lastIndexOf('\n'), 0);
+    firstIndex = choice.indexOf('(');
+    if(firstIndex == -1)
+      firstIndex = choice.length;
+    current = current.substring(0, lastIndex + 1 ).concat(choice.substring(0, firstIndex));
+    setter[0].value = current;
+    last_piece = current.substring(current.lastIndexOf('\n') + 1);
+    writer.html(nl2br(current));
+  }
+
+  function writeit(from, e){
+
+    var code = e.keyCode || e.which;
+    console.log("keycode:" + e.keyCode + ", which:" + e.which + ", code:" + code);
+    if (code == '9') {
+      //incase of tab
+      console.log(from.value);
+      code_start = from.value.lastIndexOf('\n') + 1;
+      real_code = from.value.substring(code_start);
+
+      var i, last_special = 0;
+      for(i = 0; i < real_code.length; ++i) {
+        if(['.', ';', ',', '(', ')', '='].includes(real_code[i]))
+        last_special = i + 1;
+      }
+
+      token = real_code.substring(last_special);
+      httpCall({autocomplete: true, fetch: true, token: token}, function(response) {
+        console.log(response.responseText);
+        result = response.responseText;
+        if(!result.includes("No results found")){
+          result_array = result.split('\n');
+          new_html = "";
+          for( i=0; i< result_array.length; i++){
+            console.log(result_array[i]);
+            sep = result_array[i].lastIndexOf("~");
+            first_col = result_array[i].substring(0,sep);
+            second_col = result_array[i].substring(sep+1);
+            console.log("first: " + first_col + ", second: " + second_col);
+            if (first_col != "")
+            new_html += '<tr onclick="completeme(\'' + first_col + '\')"> <td class="text-left">' + first_col + "</td>" + "<td class='text-left'>" + second_col + "</td></tr>";
+          }
+          $("#suggestions").html(new_html);
+        }
+        else{
+          new_html = '<tr><td class="text-left">Couldn\'t find a result</td><td class="text-left"></td></tr>'
+          $("#suggestions").html(new_html);
+        }
+        // <tr>
+        //     <td class="text-left">Click Tab for suggestions</td>
+        //     <td class="text-left"></td>
+        // </tr>
+        console.log("~ do the auto complete dance ~");
+      });
+    }
+    else if(code == '13'){
+      enter_pos = from.value.length - 1;
+      all_code = from.value.substring(0, enter_pos)
+      new_code_start = all_code.lastIndexOf('\n') + 1;
+      new_code = all_code.substring(new_code_start)
+      runscript(new_code)
+    }
+    else{
+      e = e || window.event;
+      var w = $(writer);
+      var tw = from.value;
+      w.html(nl2br(tw));
+    }
+  }
+  function blink(){
+    if($(cursor).css("display") == "none"){
+      $(cursor).css("display","inline");
+    } else {
+      $(cursor).css("display","none");
+    }
+  }
+  setInterval("blink()", 500);
+  $(terminal).click(function(){
+    $(setter).focus();
+  });
+  $(setter).keyup(function(event){
+    writeit(this, event);
+  });
+
+  function onPropertyChanged(e) {
+
+    code_start = setter[0].value.lastIndexOf('\n') + 1;
+    new_code = setter[0].value.substring(code_start);
+    console.log("new code: " + new_code);
+    console.log("last_piece: " + last_piece);
+    console.log("code start: " + code_start);
+    if (Math.abs(new_code.length - last_piece.length) != 1) {
+      console.log("================ CLEARING =====================");
+      httpCall({autocomplete: true, clear: true}, undefined);
+      var_name = undefined;
+    }
+
+    else if(new_code.length > last_piece.length) { // new char
+      new_char = new_code[new_code.length - 1];
+
+      if (new_char == '=') {
+        parts = new_code.substring(0, new_code.length - 1).trim().split(" ");
+        var_name = parts[parts.length - 1];
+      }
+
+      if ([';', ',', '(', '.', ')'].includes(new_char)) {
+        var i, last_special = 0;
+        for(i = 0; i < new_code.length - 1; ++i) {
+          if(['.', ';', ',', '(', ')', '='].includes(new_code[i]))
+          last_special = i + 1;
         }
 
+        for(i = new_code.length - 2; i >= 0 && new_code[i] != ' '; --i);
+        if(new_code[i] != ')') {
+          token = new_code.substring(last_special, new_code.length - 1).trim();
+          httpCall({autocomplete: true, token: token, varname: var_name, new_stack: ! (['.', ')'].includes(new_char)) }, undefined);
+          // console.log("make request: new command with {" + token + "," + var_name + "}");
+        }
+      }
 
-        last_piece = '';
-        var_name = undefined;
+      if (new_char == ')') {
+        var open_bracket = new_code.length - 2, last_special = 0;
+        var brackets_balance = 1;
 
-		function runscript(code){
-            httpCall({code: code}, function(response) {
-                console.log(writer);
-                setter[0].value = setter[0].value.substring(0, setter[0].value.length - 1) + '<br>';
-                console.log(response);
-                setter[0].value +=  response.responseText;
-                writer.html(nl2br(setter[0].value));
-            })
-		}
+        while(brackets_balance != 0) {
+          if(new_code[open_bracket] == ')')
+          brackets_balance++;
+          if(new_code[open_bracket] == '(')
+          brackets_balance--;
+          open_bracket--;
+        }
+        open_bracket++;
 
-		function nl2br(txt){
-			return txt.replace(/\n/g, '<br />'+
-			'<font color="#00c500" style="font-family: cursor, courier;font-weight: bold;">android@phone</font>'+
-			'<font color="white" style="font-family: cursor, courier;font-weight: bold;"> :</font>'+
-			'<font color="cyan" style="font-family: cursor, courier;font-weight: bold;"> \> </font>');
-		}
-        function completeme(choice){
-            new_html = '<tr><td class="text-left">Click Tab for suggestions</td><td class="text-left"></td></tr>'
-            $("#suggestions").html(new_html);
-            current = setter[0].value;
-            lastIndex =  Math.max(current.lastIndexOf('.'), current.lastIndexOf(','), current.lastIndexOf(';'), current.lastIndexOf('('));
-            firstIndex = choice.indexOf('(');
-            if(firstIndex == -1)
-                firstIndex = choice.length;
-            current = current.substring(0, lastIndex + 1 ).concat(choice.substring(0, firstIndex));
-            setter[0].value = current;
-            last_piece = current;
-            writer.html(nl2br(current));
+        for(i = 0; i < open_bracket; ++i) {
+          if(['.', ';', ',', '(', ')', '='].includes(new_code[i]))
+          last_special = i + 1;
         }
 
-		function writeit(from, e){
-            var code = e.keyCode || e.which;
-            if (code == '9') {
-                console.log(from.value);
-                code_start = from.value.lastIndexOf('\n') + 1;
-                real_code = from.value.substring(code_start);
+        var params = new_code.substring(open_bracket, new_code.length - 1).trim();
+        var num_arguments = (params.match(/,/g) || []).length;
+        num_arguments = (num_arguments == 0) ? (( params.length > 1 ) - 0) : (num_arguments + 1);
 
-                var i, last_special = 0;
-                for(i = 0; i < real_code.length; ++i) {
-                    if(['.', ';', ',', '(', ')', '='].includes(real_code[i]))
-                        last_special = i + 1;
-                }
+        name = new_code.substring(last_special, open_bracket).trim();
+        httpCall({autocomplete: true, function: name, nargs: num_arguments}, undefined);
+        // console.log("make request: func_handler with {" + num_arguments
+        //     + ", "+ new_code.substring(last_special, open_bracket).trim() + "}")
+      }
+    } else { // char removed
+      var i, removed_char = last_piece[last_piece.length - 1];
+      for(i = new_code.length - 2; i >= 0 && last_piece[i] != ' '; --i);
+      if(last_piece[i] != ')' && ['.', ';', ',', '(', ')'].includes(removed_char))
+      httpCall({autocomplete: true, removed_char: removed_char}, undefined);
+    }
 
-                token = real_code.substring(last_special);
-                httpCall({autocomplete: true, fetch: true, token: token}, function(response) {
-                    console.log(response.responseText);
-					result = response.responseText;
-                    if(!result.includes("No results found")){
-    					result_array = result.split('\n');
-                        new_html = "";
-    					for( i=0; i< result_array.length; i++){
-    						console.log(result_array[i]);
-                            sep = result_array[i].lastIndexOf("~");
-                            first_col = result_array[i].substring(0,sep);
-                            second_col = result_array[i].substring(sep+1);
-                            console.log("first: " + first_col + ", second: " + second_col);
-                            if (first_col != "")
-                                new_html += '<tr onclick="completeme(\'' + first_col + '\')"> <td class="text-left">' + first_col + "</td>" + "<td class='text-left'>" + second_col + "</td></tr>";
-    					}
-                        $("#suggestions").html(new_html);
-                    }
-                    else{
-                        new_html = '<tr><td class="text-left">Couldn\'t find a result</td><td class="text-left"></td></tr>'
-                        $("#suggestions").html(new_html);
-                    }
-                    // <tr>
-                    //     <td class="text-left">Click Tab for suggestions</td>
-                    //     <td class="text-left"></td>
-                    // </tr>
-                    console.log("~ do the auto complete dance ~");
-                });
-            }
-            else if(e.originalEvent.key == "Enter"){
-			    enter_pos = from.value.length - 1;
-			    all_code = from.value.substring(0, enter_pos)
-			    new_code_start = all_code.lastIndexOf('\n') + 1;
-			    new_code = all_code.substring(new_code_start)
-			    runscript(new_code)
-			}
-			else{
-    			e = e || window.event;
-    			var w = $(writer);
-    			var tw = from.value;
-    			w.html(nl2br(tw));
-			}
-		}
-        function blink(){
-            if($(cursor).css("display") == "none"){
-                $(cursor).css("display","inline");
-            } else {
-            	$(cursor).css("display","none");
-            }
-        }
-        setInterval("blink()", 500);
-        $(terminal).click(function(){
-        	$(setter).focus();
-        });
-		$(setter).keyup(function(event){
-			writeit(this, event);
-		});
+    last_piece = new_code;
+  }
 
-        $(setter).bind('input propertychange', function(e) {
-            code_start = this.value.lastIndexOf('\n') + 1;
-            new_code = this.value.substring(code_start);
+  window.addEventListener("paste",
+  function(e){
+    //special case: paste
+    console.log("===============paste==========");
+    console.log(e);
+    var clipboardData, pastedData;
 
-            if (Math.abs(new_code.length - last_piece.length) != 1) {
-                console.log("================ CLEARING =====================");
-                httpCall({autocomplete: true, clear: true}, undefined);
-                var_name = undefined;
-            }
+    // Stop data actually being pasted into div
+    e.stopPropagation();
+    e.preventDefault();
 
-            else if(new_code.length > last_piece.length) { // new char
-                new_char = new_code[new_code.length - 1];
+    // Get pasted data via clipboard API
+    clipboardData = e.clipboardData || window.clipboardData;
+    pastedData = clipboardData.getData('Text');
 
-                if (new_char == '=') {
-                    parts = new_code.substring(0, new_code.length - 1).trim().split(" ");
-                    var_name = parts[parts.length - 1];
-                }
+    // Do whatever with pasteddata
+    console.log(pastedData);
+    for(i = 0; i < pastedData.length; ++i) {
+      var e = $.Event('keyup');
+      e.which = pastedData.charCodeAt(i);; // Character 'A'
+      setter[0].value += pastedData[i];
+      $(setter).trigger(e);
+      onPropertyChanged(e);
+      // if (pastedData[i] == "."){
+      //   alert(pastedData[i]);
+      // }
+    }
 
-                if ([';', ',', '(', '.', ')'].includes(new_char)) {
-                    var i, last_special = 0;
-                    for(i = 0; i < new_code.length - 1; ++i) {
-                        if(['.', ';', ',', '(', ')', '='].includes(new_code[i]))
-                            last_special = i + 1;
-                    }
+  },false);
 
-                    for(i = new_code.length - 2; i >= 0 && new_code[i] != ' '; --i);
-                    if(new_code[i] != ')') {
-                        token = new_code.substring(last_special, new_code.length - 1).trim();
-                        httpCall({autocomplete: true, token: token, varname: var_name, new_stack: ! (['.', ')'].includes(new_char)) }, undefined);
-                        // console.log("make request: new command with {" + token + "," + var_name + "}");
-                    }
-                }
 
-                if (new_char == ')') {
-                    var open_bracket = new_code.length - 2, last_special = 0;
-                    var brackets_balance = 1;
-
-                    while(brackets_balance != 0) {
-                        if(new_code[open_bracket] == ')')
-                            brackets_balance++;
-                        if(new_code[open_bracket] == '(')
-                            brackets_balance--;
-                        open_bracket--;
-                    }
-                    open_bracket++;
-
-                    for(i = 0; i < open_bracket; ++i) {
-                        if(['.', ';', ',', '(', ')', '='].includes(new_code[i]))
-                            last_special = i + 1;
-                    }
-
-                    var params = new_code.substring(open_bracket, new_code.length - 1).trim();
-                    var num_arguments = (params.match(/,/g) || []).length;
-                    num_arguments = (num_arguments == 0) ? (( params.length > 1 ) - 0) : (num_arguments + 1);
-
-                    name = new_code.substring(last_special, open_bracket).trim();
-                    httpCall({autocomplete: true, function: name, nargs: num_arguments}, undefined);
-                    // console.log("make request: func_handler with {" + num_arguments
-                    //     + ", "+ new_code.substring(last_special, open_bracket).trim() + "}")
-                }
-            } else { // char removed
-                var i, removed_char = last_piece[last_piece.length - 1];
-                for(i = new_code.length - 2; i >= 0 && last_piece[i] != ' '; --i);
-                if(last_piece[i] != ')' && ['.', ';', ',', '(', ')'].includes(removed_char))
-                    httpCall({autocomplete: true, removed_char: removed_char}, undefined);
-            }
-
-            last_piece = new_code;
-        });
-	</script>
-    </body>
-    <footer>
-        <div style="max-height: 200px; overflow: auto;" >
-            <table class="table-fill" style="margin: 0px;">
-                <thead>
-                    <tr>
-                        <th class="text-left" width="45%">Suggestions</th>
-                        <th class="text-left" width="45%"></th>
-                    </tr>
-                </thead>
-                <tbody class="table-hover" id="suggestions">
-                    <tr>
-                        <td class="text-left">Click Tab for suggestions</td>
-                        <td class="text-left"></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </footer>
+  $(setter).bind('input propertychange', onPropertyChanged);
+  </script>
+</body>
+<footer>
+  <div style="max-height: 200px; overflow: auto;" >
+    <table class="table-fill" style="margin: 0px;">
+      <thead>
+        <tr>
+          <th class="text-left" width="45%">Suggestions</th>
+          <th class="text-left" width="45%"></th>
+        </tr>
+      </thead>
+      <tbody class="table-hover" id="suggestions">
+        <tr>
+          <td class="text-left">Click Tab for suggestions</td>
+          <td class="text-left"></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</footer>
 
 </html>

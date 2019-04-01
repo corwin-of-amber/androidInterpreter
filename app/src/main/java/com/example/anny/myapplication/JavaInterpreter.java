@@ -140,15 +140,22 @@ public class JavaInterpreter implements JavaInterpreterConstants {
       return new Value(res.getClass(), res);
     }
     catch(Exception e){
+        if(e == null || e.getMessage() == null){
+            return null;
+        }
         Log.d("fetch","var "  + o);
         Log.d("fetch","method "  + m.methodName);
-        Log.d("fetch","params "  + parameters);
         for (Object p : parameters){
-          Log.d("fetch","param " + p + p.getClass().getSimpleName());
+          Log.d("fetch","param value: " + p +" "+ p.getClass().getSimpleName());
         }
+        Log.d("fetch"," value of color : "+String.valueOf(MainActivity.mContext.getResources().getColor(R.color.colorAccent)));
         Log.d("fetch",  clazz.getSimpleName());
         for(Method meth : clazz.getMethods()){
             if(meth.getName().equals(m.methodName)){
+                Log.d("fetch","============expected params:=============");
+                for(Class<?> paramType : meth.getParameterTypes()){
+                    Log.d("fetch",paramType.getSimpleName());
+                }
                 throw new ParseException("failed to invoke method: "+m.methodName+" on "+clazz.getSimpleName()+" \u005cn Wrong parameters");
             }
         }

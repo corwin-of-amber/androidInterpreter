@@ -24,6 +24,9 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
         JavaInterpreter.initialize(this, getPackageName());
+
+//        this.findViewById(R.id.button).setTextColor(this.getResources().getColor(R.color.colorAccent));
+
         ((Button)findViewById(R.id.button)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

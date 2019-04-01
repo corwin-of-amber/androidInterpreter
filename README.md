@@ -39,8 +39,9 @@ You can run any Android code that matches the packages restriction, in one of th
 ```java
 // Don't forget ';' it is mandatory in the language !
 a = 5; // a will be int
-int a = 5;
-a = new Integer(5); // a will be Integer
+int a = 7; // a is still an int
+a = new Integer(5); // a is now Integer
+a = "hello world"; // a is now String
 my_button = this.findViewById(R.id.button);
 ```
 

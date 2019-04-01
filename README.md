@@ -17,6 +17,8 @@ Run Android code on-the-go after the apk already installed!
 - 👯 Clone this repo to your local machine using `https://github.com/anny234/probe_design.git`
 - **HACK AWAY!** 🔨🔨🔨
 
+*In case of emergency use* [*JavaCC*](https://javacc.org/) :rotating_light:
+
 ### Setup
 - Open the project in [Android Studio](https://developer.android.com/studio). 
 

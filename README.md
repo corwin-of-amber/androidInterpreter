@@ -41,7 +41,7 @@ You can run any Android code that matches the packages restriction, in one of th
 ```java
 // Don't forget ';' it is mandatory in the language !
 a = 5; // a will be int
-int a = 7; // a is still an int
+a = 7; // a is still an int
 a = new Integer(5); // a is now Integer
 a = "hello world"; // a is now String
 my_button = this.findViewById(R.id.button);
@@ -51,7 +51,7 @@ my_button = this.findViewById(R.id.button);
 
 ---
 ## Possible Features
-1. *Extending the language* - Right now, users still can't define their own classes or functions. Adding any other language features will give the use more power to test functions on the go.
+1. *Extending the language* - Right now, users still can't define their own classes or functions, control flow, or import packages. Adding any other language features will give the use more power to test functions on the go.
 2. *Syntax Highlighting* - Why not coloring different keywords by their meaning to the language as we know from other IDEs.
 3. *Markdown Errors(in line)* - Whenever error occures due to illegal character or bad name, markdown to the user the word in which the error occured for better finding and correcting.
 4. *Implementing History* - In many terminal you can press the 'UP' button to see previous commands.

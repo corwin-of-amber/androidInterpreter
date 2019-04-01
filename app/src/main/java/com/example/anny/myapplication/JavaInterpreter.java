@@ -77,7 +77,8 @@ public class JavaInterpreter implements JavaInterpreterConstants {
               "android.util.",
               "android.app.",
               "android.view.",
-              "android.content."
+              "android.content.",
+              "android.os."
       );
     varibals.put("this", thisVal);
     InputStream targetStream = new ByteArrayInputStream("".getBytes());

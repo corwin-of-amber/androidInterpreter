@@ -6,6 +6,10 @@
 
 package com.example.anny.myapplication;
 
+import android.util.Log;
+
+import org.apache.commons.text.StringEscapeUtils;
+
 /**
  * This exception is thrown when parse errors are encountered.
  * You can explicitly create objects of this exception type by
@@ -107,28 +111,31 @@ public class ParseException extends Exception {
       }
       expected.append(eol).append("    ");
     }
-    String retval = "Encountered \"";
+    String retval = "Encountered ";
     Token tok = currentToken.next;
     for (int i = 0; i < maxSize; i++) {
+        Log.d("debuggingme","option 1 : "+tokenImage[0]);
       if (i != 0) retval += " ";
       if (tok.kind == 0) {
-        retval += tokenImage[0];
+          retval += "\"" + tokenImage[0] + "\"";
         break;
       }
       retval += " " + tokenImage[tok.kind];
+      Log.d("debuggingme","option 2 : "+tokenImage[tok.kind]);
       retval += " \"";
       retval += add_escapes(tok.image);
       retval += " \"";
       tok = tok.next;
     }
-    retval += "\" at column " + currentToken.next.beginColumn;
+    retval += " at column " + currentToken.next.beginColumn;
     retval += "." + eol;
-    if (expectedTokenSequences.length == 1) {
-      retval += "Was expecting:" + eol + "    ";
-    } else {
-      retval += "Was expecting one of:" + eol + "    ";
-    }
-    retval += expected.toString();
+//    if (expectedTokenSequences.length == 1) {
+//      retval += "Was expecting:" + eol + "    ";
+//    } else {
+//      retval += "Was expecting one of:" + eol + "    ";
+//    }
+//    retval += expected.toString();
+    retval = StringEscapeUtils.escapeHtml4(retval);
     return retval;
   }
 

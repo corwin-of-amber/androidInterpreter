@@ -206,6 +206,11 @@
   var_name = undefined;
 
   function runscript(code){
+    if (code == ""){
+      writer.html(nl2br(setter[0].value));
+      console.log("empty command");
+      return;
+    }
     httpCall({code: code}, function(response) {
       console.log(writer);
       setter[0].value = setter[0].value.substring(0, setter[0].value.length - 1) + '<br>';

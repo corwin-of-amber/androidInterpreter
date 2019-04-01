@@ -10,6 +10,7 @@ import com.example.anny.myapplication.JavaInterpreter;
 import com.example.anny.myapplication.MainActivity;
 import com.example.anny.myapplication.ParseException;
 import com.example.anny.myapplication.R;
+import com.example.anny.myapplication.TokenMgrError;
 import com.example.anny.myapplication.auto_complete.Autocomplete;
 
 import java.io.BufferedReader;
@@ -125,8 +126,13 @@ public class MyServer extends NanoHTTPD{
                         } catch (ParseException e) {
                             ans[0] = "<font color='red'>" + e.getMessage().replaceAll("\n", "<br />");
                             ans[0] += "</font>\n";
-                            Log.d("failed", e.getMessage());
-                        } finally {
+                            Log.d("fetch","---- ParseException" + e.getMessage());
+                        } catch(TokenMgrError e) {
+                            ans[0] = "<font color='red'>" + e.getMessage().replaceAll("\n", "<br />");
+                            ans[0] += "</font>\n";
+                            Log.d("fetch","----- TokenMgrError" + e.getMessage());
+                        }
+                        finally {
                             cd.countDown();
                         }
                         Looper.loop();

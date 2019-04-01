@@ -34,6 +34,9 @@ public class MainActivity extends AppCompatActivity {
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
+                catch(TokenMgrError e){
+                    e.printStackTrace();
+                }
             }
         });
     }

@@ -140,14 +140,19 @@ public class JavaInterpreter implements JavaInterpreterConstants {
       return new Value(res.getClass(), res);
     }
     catch(Exception e){
-        System.out.println("class "  + clazz.getSimpleName());
-        System.out.println("var "  + o);
-        System.out.println("method "  + m.methodName);
-        System.out.println("params "  + parameters);
+        Log.d("fetch","var "  + o);
+        Log.d("fetch","method "  + m.methodName);
+        Log.d("fetch","params "  + parameters);
         for (Object p : parameters){
-          System.out.println("param " + p);
+          Log.d("fetch","param " + p + p.getClass().getSimpleName());
         }
-        throw new ParseException("failed to invoke: \u005cn" + e.getCause());
+        Log.d("fetch",  clazz.getSimpleName());
+        for(Method meth : clazz.getMethods()){
+            if(meth.getName().equals(m.methodName)){
+                throw new ParseException("failed to invoke method: "+m.methodName+" on "+clazz.getSimpleName()+" \u005cn Wrong parameters");
+            }
+        }
+        throw new ParseException("failed to invoke method: " + m.methodName+" on "+clazz.getSimpleName()+" \u005cn No such method found");
     }
   }
 
@@ -406,7 +411,7 @@ public class JavaInterpreter implements JavaInterpreterConstants {
             {if (true) return v;}
           }
           catch(Exception e){
-            {if (true) throw new ParseException("failed to create value no params");}
+            {if (true) throw new ParseException("failed to call constructor with no parameters");}
           }
         }
         try{
@@ -414,7 +419,7 @@ public class JavaInterpreter implements JavaInterpreterConstants {
           v = new Value(clazz, val);
         }
         catch(Exception e){
-          {if (true) throw new ParseException("failed to create value");}
+          {if (true) throw new ParseException("failed to call constructor");}
         }
       }
     }

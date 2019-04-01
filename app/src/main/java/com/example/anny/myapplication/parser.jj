@@ -483,7 +483,7 @@ Value SimpleExp():
             return v;
           }
           catch(Exception e){
-            throw new ParseException("failed to create value no params");
+            throw new ParseException("Failed to call constructor");
           }
         }
         try{
@@ -491,7 +491,7 @@ Value SimpleExp():
           v = new Value(clazz, val);
         }
         catch(Exception e){
-          throw new ParseException("failed to create value");
+          throw new ParseException("Failed to call constructor");
         }
       }
     }

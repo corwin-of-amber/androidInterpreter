@@ -33,7 +33,18 @@ adb forward tcp:8080 tcp:8080
 ---
 ## Getting Started
 
-*Under construction*
+**Please note that only code that uses the packages defined in the Packages array in JavaInterpreter.java will be able to autocomplete and run (so add the relevant packages to you there).**
+
+You can run any Android code that matches the packages restriction, in one of these different forms:
+```java
+// Don't forget ';' it is mandatory in the language !
+a = 5; // a will be int
+int a = 5;
+a = new Integer(5); // a will be Integer
+my_button = this.findViewById(R.id.button);
+```
+
+* If you want to get Autocomplete suggestions (in the lower side of the page) click the 'TAB' key to get suggestions of possible code choices. If you see suggestion you like, click on it and it will be filled to the terminal.
 
 ---
 ## Possible Features

@@ -32,7 +32,6 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 try {
                     String code = ((EditText)findViewById(R.id.editText)).getText().toString();
-                    Log.d("codeis", code);
                     JavaInterpreter.parseFunc(code);
                 } catch (ParseException e) {
                     e.printStackTrace();

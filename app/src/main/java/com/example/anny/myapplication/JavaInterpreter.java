@@ -143,19 +143,8 @@ public class JavaInterpreter implements JavaInterpreterConstants {
         if(e == null || e.getMessage() == null){
             return null;
         }
-        Log.d("fetch","var "  + o);
-        Log.d("fetch","method "  + m.methodName);
-        for (Object p : parameters){
-          Log.d("fetch","param value: " + p +" "+ p.getClass().getSimpleName());
-        }
-        Log.d("fetch"," value of color : "+String.valueOf(MainActivity.mContext.getResources().getColor(R.color.colorAccent)));
-        Log.d("fetch",  clazz.getSimpleName());
         for(Method meth : clazz.getMethods()){
             if(meth.getName().equals(m.methodName)){
-                Log.d("fetch","============expected params:=============");
-                for(Class<?> paramType : meth.getParameterTypes()){
-                    Log.d("fetch",paramType.getSimpleName());
-                }
                 throw new ParseException("failed to invoke method: "+m.methodName+" on "+clazz.getSimpleName()+" \u005cn Wrong parameters");
             }
         }
@@ -164,12 +153,9 @@ public class JavaInterpreter implements JavaInterpreterConstants {
   }
 
   public static Class<?> checkClass(Token className) throws ParseException{
-    Log.d("fetch","searching for class name "+className.image);
     for (String pkg : packages){
-      Log.d("fetch", " checking pck "+pkg);
       Class<?> clazz = classExists(pkg + className.image);
       if (clazz != null ){
-        Log.d("fetch"," found class in pckg :"+pkg + clazz.getSimpleName());
         return clazz;
       }
     }

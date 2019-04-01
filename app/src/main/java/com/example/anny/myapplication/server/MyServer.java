@@ -45,43 +45,31 @@ public class MyServer extends NanoHTTPD{
         // autocomplete stuff
         String response = "";
         if(parms.get("clear") != null) {
-            // case of \n
-            Log.d("fetch2", "clear");
             autocompleteManager.clear();
         }
         else if(parms.get("fetch") != null)
         {
             // case of tab
-            Log.d("fetch2", "completeme");
             List<String> result = autocompleteManager.DoAutoComplete(parms.get("token"));
             for(String r : result) response += r + "\n";
         }
         else if(parms.get("removed_char") != null)
             // case of backspace
         {
-            Log.d("fetch2", "backspace");
             autocompleteManager.delete_char(parms.get("removed_char").charAt(0));
         }
         else if(parms.get("function") != null){
             // case of function -> ')' ?
-            Log.d("fetch2", "function");
             String nargs_value = parms.get("nargs");
             nargs_value = (nargs_value == null) ? "0" : nargs_value;
-            Log.d("fetch2", "args: " + nargs_value);
-            Log.d("fetch2", "function: " + parms.get("function"));
             autocompleteManager.func_handler(Integer.parseInt(nargs_value), parms.get("function"));
         }
         else if(parms.get("token") != null) {
-            Log.d("fetch2", "token: " + parms.get("token"));
             if(parms.get("new_stack") != null) {
-                Log.d("fetch2", "newstack");
                 autocompleteManager.new_command(parms.get("token"), parms.get("varname"));
             }
             else{
-                Log.d("fetch",">?>?>?>?");
-                Log.d("fetch2", "no newstack");
                 Class<?> result = autocompleteManager.add_type(parms.get("token"));
-                Log.d("fetch",result.getSimpleName());
             }
         }
         return newFixedLengthResponse(response);
@@ -122,15 +110,12 @@ public class MyServer extends NanoHTTPD{
                         Looper.prepare();
                         try {
                             JavaInterpreter.parseFunc(parms.get("code"));
-                            Log.d("code", "successfuly done code ");
                         } catch (ParseException e) {
                             ans[0] = "<font color='red'>" + e.getMessage().replaceAll("\n", "<br />");
                             ans[0] += "</font>\n";
-                            Log.d("fetch","---- ParseException" + e.getMessage());
                         } catch(TokenMgrError e) {
                             ans[0] = "<font color='red'>" + e.getMessage().replaceAll("\n", "<br />");
                             ans[0] += "</font>\n";
-                            Log.d("fetch","----- TokenMgrError" + e.getMessage());
                         }
                         finally {
                             cd.countDown();

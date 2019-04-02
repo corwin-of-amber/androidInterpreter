@@ -8,7 +8,6 @@ Run Android code on-the-go after the apk already installed!
 - [Installation and Setup](#installation-and-setup)
 - [Getting Started](#getting-started)
 - [Possible Features](#possible-features)
-- [Contributers](#Contributers)
 
 ---
 
@@ -37,17 +36,40 @@ adb forward tcp:8080 tcp:8080
 
 **Please note that only code that uses the packages defined in the Packages array in JavaInterpreter.java will be able to autocomplete and run (so add the relevant packages to you there).**
 
-You can run any Android code that matches the packages restriction, in one of these different forms:
+#### Object Decleration and Instantiation
+As you can see in the code below, you can override variables in the program any time. Meaning, the type of a variable can be changed during your coding.
 ```java
-// Don't forget ';' it is mandatory in the language !
-a = 5; // a will be int
-a = 7; // a is still an int
-a = new Integer(5); // a is now Integer
-a = "hello world"; // a is now String
-my_button = this.findViewById(R.id.button);
+int a = 5;        // a is an int
+a = 7;            // a is an int (inferred)
+String j;         // j is a String
+j = 7.7;          // j is a double
 ```
-
-* If you want to get Autocomplete suggestions (in the lower side of the page) click the 'TAB' key to get suggestions of possible code choices. If you see suggestion you like, click on it and it will be filled to the terminal.
+#### Assigments
+```java
+j = "hello world"; // j is a String
+a = j;             // a is a String "hello world"
+```
+#### Static Method Invocation
+```java
+b = Toast.makeText(this,"hello world", Toast.LENGTH_LONG);
+b.show();
+```
+**OR**
+```java
+Toast.makeText(this,"hello world", Toast.LENGTH_LONG).show();
+```
+#### Accessing static fields
+```java
+int length_long = Toast.LENGTH_LONG;
+```
+#### Arrays
+The language now supports declaring arrays:
+```java
+a = new Integer[3]; // a is an Integer array of length 3
+b = new int[3];     // fail - no arrays on primitive language types
+```
+#### Autocomplete
+In the bottom of the page you will see the suggestions tab. If you want to get autocomplete suggetstions simply click the 'TAB' key to get suggestions of possible code choices. If you already started typing the autocomplete will return relevant results matching to that prefix. If you see suggestion you like, click on it and it will be written to the terminal.
 
 ---
 ## Possible Features

@@ -11,7 +11,7 @@ import java.lang.reflect.*;
 import java.io.*;
 import android.util.Log;
 import org.apache.commons.lang3.reflect.*;
-/** New line translator. */
+
 public class JavaInterpreter implements JavaInterpreterConstants {
 
   // =================================
@@ -58,7 +58,7 @@ public class JavaInterpreter implements JavaInterpreterConstants {
   // =================================
   //        CLASS VARIABLES
   // =================================
-  public static Map<String,Value> varibals = new HashMap<String,Value>();
+  public static Map<String,Value> variables = new HashMap<String,Value>();
   public static JavaInterpreter parser;
   public static String mypackage;
   public static List<String> packages;
@@ -80,7 +80,7 @@ public class JavaInterpreter implements JavaInterpreterConstants {
               "android.content.",
               "android.os."
       );
-    varibals.put("this", thisVal);
+    variables.put("this", thisVal);
     InputStream targetStream = new ByteArrayInputStream("".getBytes());
     parser = new JavaInterpreter(targetStream );
   }
@@ -96,7 +96,7 @@ public class JavaInterpreter implements JavaInterpreterConstants {
   //        HELPER FUNCTIONS
   // =================================
   public static boolean doesVarExist(String var_name){
-    return varibals.containsKey(var_name);
+    return variables.containsKey(var_name);
   }
 
   public static Object getNewInstance(final Class<?> clazz, List<Value> constructorParameters) throws ParseException{
@@ -144,8 +144,19 @@ public class JavaInterpreter implements JavaInterpreterConstants {
         if(e == null || e.getMessage() == null){
             return null;
         }
+        Log.d("fetch","var "  + o);
+        Log.d("fetch","method "  + m.methodName);
+        for (Object p : parameters){
+          Log.d("fetch","param value: " + p +" "+ p.getClass().getSimpleName());
+        }
+        Log.d("fetch"," value of color : "+String.valueOf(MainActivity.mContext.getResources().getColor(R.color.colorAccent)));
+        Log.d("fetch",  clazz.getSimpleName());
         for(Method meth : clazz.getMethods()){
             if(meth.getName().equals(m.methodName)){
+                Log.d("fetch","============expected params:=============");
+                for(Class<?> paramType : meth.getParameterTypes()){
+                    Log.d("fetch",paramType.getSimpleName());
+                }
                 throw new ParseException("failed to invoke method: "+m.methodName+" on "+clazz.getSimpleName()+" \u005cn Wrong parameters");
             }
         }
@@ -154,13 +165,16 @@ public class JavaInterpreter implements JavaInterpreterConstants {
   }
 
   public static Class<?> checkClass(Token className) throws ParseException{
+    Log.d("fetch","searching for class name "+className);
     for (String pkg : packages){
-      Class<?> clazz = classExists(pkg + className.image);
+      Log.d("fetch", " checking pck "+pkg);
+      Class<?> clazz = classExists(pkg + className);
       if (clazz != null ){
+        Log.d("fetch"," found class in pckg :"+pkg + clazz.getSimpleName());
         return clazz;
       }
     }
-    throw new ParseException("Encountered \"" + className.image + "\" at column " + className.beginColumn + ".\nsymbol doesnt exist");
+    throw new ParseException("Encountered '" + className + "' at column " + className.beginColumn + ". symbol doesnt exist");
 
   }
 
@@ -226,13 +240,13 @@ public class JavaInterpreter implements JavaInterpreterConstants {
   List<Value> l = null;
   Token name = null;
     name = jj_consume_token(NAME);
-    jj_consume_token(LPARAM);
+    jj_consume_token(LPAREN);
     if (jj_2_5(2)) {
       l = ParamList();
     } else {
       ;
     }
-    jj_consume_token(RPARAM);
+    jj_consume_token(RPAREN);
     if (l == null){
       l = new ArrayList<Value>();
     }
@@ -241,6 +255,26 @@ public class JavaInterpreter implements JavaInterpreterConstants {
     throw new Error("Missing return statement in function");
   }
 
+// List<MethodClass> InvocList():
+// {
+//   List<MethodClass> invocations = null;
+//   List<Value> l = null;
+//   Token name = null;
+// }
+// {
+//   (name = <NAME> <LPAREN> (l = ParamList())? <RPAREN> (<DOT> invocations = InvocList())?)
+//   {
+//     if (l == null){
+//       l = new ArrayList<Value>();
+//     }
+//     MethodClass m = new MethodClass(name.image, l);
+//     if (invocations == null){
+//       invocations = new ArrayList<MethodClass>();
+//     }
+//     invocations.add(0, m);
+//     return invocations;
+//   }
+// }
   static final public List<Value> ParamList() throws ParseException {
   List<Value> l = null;
   Value v = null;
@@ -278,9 +312,9 @@ public class JavaInterpreter implements JavaInterpreterConstants {
     }
     v = Exp();
     if (var_name != null){
-      varibals.put(var_name.image, v);
+      variables.put(var_name.image, v);
       //DEBUG
-      System.out.println("all variables: " + varibals.toString());
+      System.out.println("all variables: " + variables.toString());
     }
   }
 
@@ -314,10 +348,7 @@ public class JavaInterpreter implements JavaInterpreterConstants {
               }
             }
             if (!flag){
-                {
-                  if (true)
-                    throw new ParseException("no such symbol: " + i.field);
-                }
+                {if (true) throw new ParseException("no such symbol: " + i.field);}
             }
           }
         }
@@ -349,26 +380,23 @@ public class JavaInterpreter implements JavaInterpreterConstants {
     }
     catch(Exception e){
       if (doesVarExist(var_name.image)){
-        v = varibals.get(var_name.image);
+        v = variables.get(var_name.image);
       }
       else {
-        {if (true)
-          throw new ParseException("Encountered \"" + var_name.image + "\" at column " + var_name.beginColumn + ".\nsymbol doesnt exist");
-        }
-
+        {if (true) throw new ParseException("symbol " + var_name + " doesnt exist");}
       }
     }
     } else if (jj_2_13(2)) {
       jj_consume_token(NEW);
       class_name = jj_consume_token(NAME);
       if (jj_2_10(2)) {
-        jj_consume_token(LPARAM);
+        jj_consume_token(LPAREN);
         if (jj_2_9(2)) {
           l = ParamList();
         } else {
           ;
         }
-        jj_consume_token(RPARAM);
+        jj_consume_token(RPAREN);
       } else if (jj_2_11(2)) {
         jj_consume_token(LARRAY);
         size_arr = jj_consume_token(INT_NUM);
@@ -405,7 +433,7 @@ public class JavaInterpreter implements JavaInterpreterConstants {
             {if (true) return v;}
           }
           catch(Exception e){
-            {if (true) throw new ParseException("failed to call constructor with no parameters");}
+            {if (true) throw new ParseException("Failed to call constructor");}
           }
         }
         try{
@@ -413,7 +441,7 @@ public class JavaInterpreter implements JavaInterpreterConstants {
           v = new Value(clazz, val);
         }
         catch(Exception e){
-          {if (true) throw new ParseException("failed to call constructor");}
+          {if (true) throw new ParseException("Failed to call constructor");}
         }
       }
     }
@@ -566,6 +594,51 @@ public class JavaInterpreter implements JavaInterpreterConstants {
     finally { jj_save(17, xla); }
   }
 
+  static private boolean jj_3R_3() {
+    if (jj_scan_token(DOT)) return true;
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3_2()) {
+    jj_scanpos = xsp;
+    if (jj_3_3()) return true;
+    }
+    return false;
+  }
+
+  static private boolean jj_3_5() {
+    if (jj_3R_4()) return true;
+    return false;
+  }
+
+  static private boolean jj_3_1() {
+    if (jj_3R_1()) return true;
+    return false;
+  }
+
+  static private boolean jj_3_7() {
+    if (jj_scan_token(NAME)) return true;
+    if (jj_scan_token(ASSIGN)) return true;
+    return false;
+  }
+
+  static private boolean jj_3_9() {
+    if (jj_3R_4()) return true;
+    return false;
+  }
+
+  static private boolean jj_3_4() {
+    if (jj_3R_3()) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_5() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3_7()) jj_scanpos = xsp;
+    if (jj_3R_7()) return true;
+    return false;
+  }
+
   static private boolean jj_3_18() {
     if (jj_scan_token(FALSE)) return true;
     return false;
@@ -577,11 +650,11 @@ public class JavaInterpreter implements JavaInterpreterConstants {
   }
 
   static private boolean jj_3_10() {
-    if (jj_scan_token(LPARAM)) return true;
+    if (jj_scan_token(LPAREN)) return true;
     Token xsp;
     xsp = jj_scanpos;
     if (jj_3_9()) jj_scanpos = xsp;
-    if (jj_scan_token(RPARAM)) return true;
+    if (jj_scan_token(RPAREN)) return true;
     return false;
   }
 
@@ -641,7 +714,7 @@ public class JavaInterpreter implements JavaInterpreterConstants {
 
   static private boolean jj_3R_2() {
     if (jj_scan_token(NAME)) return true;
-    if (jj_scan_token(LPARAM)) return true;
+    if (jj_scan_token(LPAREN)) return true;
     return false;
   }
 
@@ -693,51 +766,6 @@ public class JavaInterpreter implements JavaInterpreterConstants {
 
   static private boolean jj_3_2() {
     if (jj_3R_2()) return true;
-    return false;
-  }
-
-  static private boolean jj_3R_3() {
-    if (jj_scan_token(DOT)) return true;
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3_2()) {
-    jj_scanpos = xsp;
-    if (jj_3_3()) return true;
-    }
-    return false;
-  }
-
-  static private boolean jj_3_5() {
-    if (jj_3R_4()) return true;
-    return false;
-  }
-
-  static private boolean jj_3_1() {
-    if (jj_3R_1()) return true;
-    return false;
-  }
-
-  static private boolean jj_3_4() {
-    if (jj_3R_3()) return true;
-    return false;
-  }
-
-  static private boolean jj_3_7() {
-    if (jj_scan_token(NAME)) return true;
-    if (jj_scan_token(ASSIGN)) return true;
-    return false;
-  }
-
-  static private boolean jj_3_9() {
-    if (jj_3R_4()) return true;
-    return false;
-  }
-
-  static private boolean jj_3R_5() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3_7()) jj_scanpos = xsp;
-    if (jj_3R_7()) return true;
     return false;
   }
 

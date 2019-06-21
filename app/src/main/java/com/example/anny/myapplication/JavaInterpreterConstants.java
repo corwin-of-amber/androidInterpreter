@@ -23,9 +23,9 @@ public interface JavaInterpreterConstants {
   /** RegularExpression Id. */
   int COMMA = 8;
   /** RegularExpression Id. */
-  int LPARAM = 9;
+  int LPAREN = 9;
   /** RegularExpression Id. */
-  int RPARAM = 10;
+  int RPAREN = 10;
   /** RegularExpression Id. */
   int LARRAY = 11;
   /** RegularExpression Id. */

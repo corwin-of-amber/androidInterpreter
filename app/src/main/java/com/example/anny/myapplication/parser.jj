@@ -1,35 +1,8 @@
 
-/* Copyright (c) 2006, Sun Microsystems, Inc.
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- *     * Redistributions of source code must retain the above copyright notice,
- *       this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the Sun Microsystems, Inc. nor the names of its
- *       contributors may be used to endorse or promote products derived from
- *       this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
- * THE POSSIBILITY OF SUCH DAMAGE.
- */
 
- options {
-   LOOKAHEAD = 2;
- }
+options {
+  LOOKAHEAD = 2;
+}
 
 PARSER_BEGIN(JavaInterpreter)
 // =================================
@@ -44,13 +17,13 @@ import java.lang.reflect.*;
 import java.io.*;
 import android.util.Log;
 import org.apache.commons.lang3.reflect.*;
-/** New line translator. */
+
 public class JavaInterpreter {
 
   // =================================
   //        INNER CLASSES
   // =================================
-  static class Value{
+  public static class Value{
     public Class<?> clazz;
     public Object value;
     public boolean isArray;
@@ -91,9 +64,10 @@ public class JavaInterpreter {
   // =================================
   //        CLASS VARIABLES
   // =================================
-  public static Map<String,Value> varibals = new HashMap<String,Value>();
+  public static Map<String,Value> variables = new HashMap<String,Value>();
   public static JavaInterpreter parser;
   public static String mypackage;
+  public static List<String> packages;
 
   // =================================
   //              MAIN
@@ -101,7 +75,18 @@ public class JavaInterpreter {
   public static void initialize(Object thisObj, String packagename){
     Value thisVal = new Value(thisObj.getClass(), thisObj);
     mypackage = packagename;
-    varibals.put("this", thisVal);
+    packages = Arrays.asList(
+              mypackage + ".",
+              "java.lang.",
+              "java.util.",
+              "android.widget.",
+              "android.util.",
+              "android.app.",
+              "android.view.",
+              "android.content.",
+              "android.os."
+      );
+    variables.put("this", thisVal);
     InputStream targetStream = new ByteArrayInputStream("".getBytes());
     parser = new JavaInterpreter(targetStream );
   }
@@ -117,7 +102,7 @@ public class JavaInterpreter {
   //        HELPER FUNCTIONS
   // =================================
   public static boolean doesVarExist(String var_name){
-    return varibals.containsKey(var_name);
+    return variables.containsKey(var_name);
   }
 
   public static Object getNewInstance(final Class<?> clazz, List<Value> constructorParameters) throws ParseException{
@@ -162,36 +147,40 @@ public class JavaInterpreter {
       return new Value(res.getClass(), res);
     }
     catch(Exception e){
-        System.out.println("class "  + clazz.getSimpleName());
-        System.out.println("var "  + o);
-        System.out.println("method "  + m.methodName);
-        System.out.println("params "  + parameters);
-        for (Object p : parameters){
-          System.out.println("param " + p);
+        if(e == null || e.getMessage() == null){
+            return null;
         }
-        throw new ParseException("failed to invoke: \n" + e.getCause());
+        Log.d("fetch","var "  + o);
+        Log.d("fetch","method "  + m.methodName);
+        for (Object p : parameters){
+          Log.d("fetch","param value: " + p +" "+ p.getClass().getSimpleName());
+        }
+        Log.d("fetch"," value of color : "+String.valueOf(MainActivity.mContext.getResources().getColor(R.color.colorAccent)));
+        Log.d("fetch",  clazz.getSimpleName());
+        for(Method meth : clazz.getMethods()){
+            if(meth.getName().equals(m.methodName)){
+                Log.d("fetch","============expected params:=============");
+                for(Class<?> paramType : meth.getParameterTypes()){
+                    Log.d("fetch",paramType.getSimpleName());
+                }
+                throw new ParseException("failed to invoke method: "+m.methodName+" on "+clazz.getSimpleName()+" \u005cn Wrong parameters");
+            }
+        }
+        throw new ParseException("failed to invoke method: " + m.methodName+" on "+clazz.getSimpleName()+" \u005cn No such method found");
     }
   }
 
-  public static Class<?> checkClass(String className) throws ParseException{
-    List<String> packages = Arrays.asList(
-            mypackage + ".",
-            "java.lang.",
-            "java.util.",
-            "android.widget.",
-            "android.util.",
-            "android.app.",
-            "android.view.",
-            "android.content."
-    );
+  public static Class<?> checkClass(Token className) throws ParseException{
+    Log.d("fetch","searching for class name "+className);
     for (String pkg : packages){
-
+      Log.d("fetch", " checking pck "+pkg);
       Class<?> clazz = classExists(pkg + className);
       if (clazz != null ){
+        Log.d("fetch"," found class in pckg :"+pkg + clazz.getSimpleName());
         return clazz;
       }
     }
-    throw new ParseException("symbol doesnt exist");
+    throw new ParseException("Encountered '" + className + "' at column " + className.beginColumn + ". symbol doesnt exist");
 
   }
 
@@ -225,9 +214,9 @@ TOKEN :
 |
   < COMMA: "," >
 |
-  < LPARAM: "(" >
+  < LPAREN: "(" >
 |
-  < RPARAM: ")" >
+  < RPAREN: ")" >
 |
   < LARRAY: "[" >
 |
@@ -249,7 +238,7 @@ TOKEN :
 |
   < STRING_T: "string" >
 |
-  < STRING: "\"" (["a"-"z","A"-"Z","_","0"-"9",".", " "])* "\"" > //TODO fix string
+  < STRING: "\"" (~["\"", "\\"] | ("\\" ~[]))* "\"" >
 |
   < DOT: "." >
 |
@@ -305,7 +294,7 @@ MethodClass MethodInvoke():
   Token name = null;
 }
 {
-  (name = <NAME> <LPARAM> (l = ParamList())? <RPARAM>)
+  (name = <NAME> <LPAREN> (l = ParamList())? <RPAREN>)
   {
     if (l == null){
       l = new ArrayList<Value>();
@@ -322,7 +311,7 @@ MethodClass MethodInvoke():
 //   Token name = null;
 // }
 // {
-//   (name = <NAME> <LPARAM> (l = ParamList())? <RPARAM> (<DOT> invocations = InvocList())?)
+//   (name = <NAME> <LPAREN> (l = ParamList())? <RPAREN> (<DOT> invocations = InvocList())?)
 //   {
 //     if (l == null){
 //       l = new ArrayList<Value>();
@@ -374,9 +363,9 @@ void Statment():
   ((var_name = <NAME> <ASSIGN>)? v = Exp() )
   {
     if (var_name != null){
-      varibals.put(var_name.image, v);
+      variables.put(var_name.image, v);
       //DEBUG
-      System.out.println("all variables: " + varibals.toString());
+      System.out.println("all variables: " + variables.toString());
     }
   }
 }
@@ -439,25 +428,25 @@ Value SimpleExp():
 
 
     try{
-      Class<?> clazz1 = checkClass(var_name.image);
+      Class<?> clazz1 = checkClass(var_name);
       v = new Value(clazz1, null);
     }
     catch(Exception e){
       if (doesVarExist(var_name.image)){
-        v = varibals.get(var_name.image);
+        v = variables.get(var_name.image);
       }
       else {
-        throw new ParseException("symbol " + var_name.image + " doesnt exist");
+        throw new ParseException("symbol " + var_name + " doesnt exist");
       }
     }
 
   }|
   <NEW>
   (class_name = <NAME>)
-  ((<LPARAM> ( l = ParamList())? <RPARAM>) | (<LARRAY> size_arr = <INT_NUM> <RARRAY>)) {
+  ((<LPAREN> ( l = ParamList())? <RPAREN>) | (<LARRAY> size_arr = <INT_NUM> <RARRAY>)) {
     //get class:
     //case: regular class
-    clazz = checkClass(class_name.image);
+    clazz = checkClass(class_name);
 
     if (clazz != null){
       //case: array

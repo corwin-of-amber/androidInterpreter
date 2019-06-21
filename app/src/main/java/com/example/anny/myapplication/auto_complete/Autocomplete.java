@@ -151,9 +151,9 @@ public class Autocomplete {
                 }
 
                 // in variables
-                if (JavaInterpreter.varibals.containsKey(s))
+                if (JavaInterpreter.variables.containsKey(s))
                 {
-                    return types.get(0).expression.push(JavaInterpreter.varibals.get(s).clazz);
+                    return types.get(0).expression.push(JavaInterpreter.variables.get(s).clazz);
                 }
                 // class name
                 try {
@@ -248,9 +248,9 @@ public class Autocomplete {
                     result.add(td.name + "~" + td.getType());
             }
             // already declared and ran
-            for(String var : JavaInterpreter.varibals.keySet()){
+            for(String var : JavaInterpreter.variables.keySet()){
                 if(var.startsWith(s)){
-                    result.add(var + "~" + JavaInterpreter.varibals.get(var).clazz);
+                    result.add(var + "~" + JavaInterpreter.variables.get(var).clazz);
                 }
             }
             // some class name if I would know how to check it

@@ -40,9 +40,9 @@ public class JavaInterpreter {
               "android.content.",
               "android.os."
       );
-    Parser.variables.put("this", thisVal);
     InputStream targetStream = new ByteArrayInputStream("".getBytes());
     parser = new Parser(targetStream );
+    parser.variables.put("this", thisVal);
   }
 
   public static void parseFunc(String s) throws ParseException {

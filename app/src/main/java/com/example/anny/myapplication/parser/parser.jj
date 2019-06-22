@@ -2,6 +2,7 @@
 
 options {
   LOOKAHEAD = 2;
+  STATIC = false;
 }
 
 PARSER_BEGIN(Parser)
@@ -23,13 +24,13 @@ public class Parser {
   // =================================
   //        CLASS VARIABLES
   // =================================
-  public static Map<String,Value> variables = new HashMap<String,Value>();
+  public Map<String,Value> variables = new HashMap<String,Value>();
 
   // =================================
   //        HELPER FUNCTIONS
   // =================================
-  public static boolean doesVarExist(String var_name){
-    return variables.containsKey(var_name);
+  public Value lookupVariable(String var_name){
+    return variables.get(var_name);
   }
 
 }
@@ -272,10 +273,8 @@ Value SimpleExp():
       v = new Value(clazz1, null);
     }
     catch(Exception e){
-      if (doesVarExist(var_name.image)){
-        v = variables.get(var_name.image);
-      }
-      else {
+      v = lookupVariable(var_name.image);
+      if (v == null) {
         throw new ParseException("symbol " + var_name + " doesnt exist");
       }
     }

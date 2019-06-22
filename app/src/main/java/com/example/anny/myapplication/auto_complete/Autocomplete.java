@@ -2,8 +2,10 @@ package com.example.anny.myapplication.auto_complete;
 
 import android.content.pm.PackageManager;
 import android.util.Log;
+
 import com.example.anny.myapplication.JavaInterpreter;
 import com.example.anny.myapplication.MainActivity;
+import com.example.anny.myapplication.ir.Value;
 import com.example.anny.myapplication.parser.ParseException;
 import com.example.anny.myapplication.parser.Parser;
 import com.example.anny.myapplication.parser.Token;
@@ -25,12 +27,24 @@ import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 
 public class Autocomplete {
-    // ==================================
-    //          CLASS VARIABLES
-    // ==================================
-    private List<TypeData> types= new ArrayList<>();
-    public static boolean bad_code = false;
+
+    private List<TypeData> types = new ArrayList<>();
     private Set<String> classes = new HashSet<>();
+    private Parser parser;
+
+    public static boolean bad_code = false;
+
+    public Autocomplete(Parser parser) {
+        this.parser = parser;
+        types.add(new TypeData());
+        try {
+            classes = FindAllClasses();
+        }
+        catch(Exception e){
+            Log.d("fetch", "autocomplete could not find classes by package");
+        }
+    }
+
 
     // ==================================
     //         PRIVATE FUNCTIONS
@@ -120,17 +134,6 @@ public class Autocomplete {
         return classes;
     }
 
-    //              CTOR
-    public Autocomplete(){
-        types.add(new TypeData());
-        try {
-            classes = FindAllClasses();
-        }
-        catch(Exception e){
-            Log.d("fetch", "didnt find classes by package");
-        }
-    }
-
     // ==================================
     //           FUNCTIONS
     // ==================================
@@ -151,10 +154,11 @@ public class Autocomplete {
                     }
                 }
 
-                // in variables
-                if (Parser.variables.containsKey(s))
+                // variable name
+                Value var = parser.lookupVariable(s);
+                if (var != null)
                 {
-                    return types.get(0).expression.push(Parser.variables.get(s).clazz);
+                    return types.get(0).expression.push(var.clazz);
                 }
                 // class name
                 try {
@@ -249,9 +253,9 @@ public class Autocomplete {
                     result.add(td.name + "~" + td.getType());
             }
             // already declared and ran
-            for(String var : Parser.variables.keySet()){
+            for(String var : parser.variables.keySet()){
                 if(var.startsWith(s)){
-                    result.add(var + "~" + Parser.variables.get(var).clazz);
+                    result.add(var + "~" + parser.variables.get(var).clazz);
                 }
             }
             // some class name if I would know how to check it

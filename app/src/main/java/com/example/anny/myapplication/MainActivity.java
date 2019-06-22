@@ -20,14 +20,13 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         mContext = this;
 
-        // open the MyServer
+        JavaInterpreter.initialize(this, getPackageName());
+
+        // start the server
         Thread thread = new myThread2();
         thread.start();
 
         setContentView(R.layout.activity_main);
-        JavaInterpreter.initialize(this, getPackageName());
-
-//        this.findViewById(R.id.button).setTextColor(this.getResources().getColor(R.color.colorAccent));
 
         ((Button)findViewById(R.id.button)).setOnClickListener(new View.OnClickListener() {
             @Override

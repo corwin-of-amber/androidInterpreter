@@ -37,7 +37,7 @@ public class MyServer extends NanoHTTPD{
         Log.d("state","\nRunning! Point your browsers to http://<your phone ip>:8080/ \n");
         System.out.println("\nRunning! Point your browsers to http://<your phone ip>:8080/ \n");
 
-        autocompleteManager = new Autocomplete();
+        autocompleteManager = new Autocomplete(JavaInterpreter.parser);
     }
 
     public Response run_autocomplete(Map<String, String> parms){

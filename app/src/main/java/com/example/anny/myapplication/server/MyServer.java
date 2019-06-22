@@ -8,9 +8,8 @@ import android.widget.ListView;
 
 import com.example.anny.myapplication.JavaInterpreter;
 import com.example.anny.myapplication.MainActivity;
-import com.example.anny.myapplication.ParseException;
-import com.example.anny.myapplication.R;
-import com.example.anny.myapplication.TokenMgrError;
+import com.example.anny.myapplication.parser.ParseException;
+import com.example.anny.myapplication.parser.TokenMgrError;
 import com.example.anny.myapplication.auto_complete.Autocomplete;
 
 import java.io.BufferedReader;

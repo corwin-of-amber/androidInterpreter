@@ -4,8 +4,9 @@ import android.content.pm.PackageManager;
 import android.util.Log;
 import com.example.anny.myapplication.JavaInterpreter;
 import com.example.anny.myapplication.MainActivity;
-import com.example.anny.myapplication.ParseException;
-import com.example.anny.myapplication.Token;
+import com.example.anny.myapplication.parser.ParseException;
+import com.example.anny.myapplication.parser.Parser;
+import com.example.anny.myapplication.parser.Token;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -151,9 +152,9 @@ public class Autocomplete {
                 }
 
                 // in variables
-                if (JavaInterpreter.variables.containsKey(s))
+                if (Parser.variables.containsKey(s))
                 {
-                    return types.get(0).expression.push(JavaInterpreter.variables.get(s).clazz);
+                    return types.get(0).expression.push(Parser.variables.get(s).clazz);
                 }
                 // class name
                 try {
@@ -248,9 +249,9 @@ public class Autocomplete {
                     result.add(td.name + "~" + td.getType());
             }
             // already declared and ran
-            for(String var : JavaInterpreter.variables.keySet()){
+            for(String var : Parser.variables.keySet()){
                 if(var.startsWith(s)){
-                    result.add(var + "~" + JavaInterpreter.variables.get(var).clazz);
+                    result.add(var + "~" + Parser.variables.get(var).clazz);
                 }
             }
             // some class name if I would know how to check it

@@ -1,0 +1,1 @@
+cd app/src/main/java/com/example/anny/myapplication/parser/ && javacc parser.jj

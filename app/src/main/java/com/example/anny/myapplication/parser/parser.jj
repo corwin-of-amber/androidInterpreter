@@ -4,99 +4,26 @@ options {
   LOOKAHEAD = 2;
 }
 
-PARSER_BEGIN(JavaInterpreter)
+PARSER_BEGIN(Parser)
 // =================================
 //        IMPORTS
 // =================================
 
-package com.example.anny.myapplication;
+package com.example.anny.myapplication.parser;
 
 import java.lang.*;
 import java.util.*;
 import java.lang.reflect.*;
-import java.io.*;
-import android.util.Log;
-import org.apache.commons.lang3.reflect.*;
 
-public class JavaInterpreter {
+import com.example.anny.myapplication.ir.*;
+import static com.example.anny.myapplication.JavaInterpreter.*;
 
-  // =================================
-  //        INNER CLASSES
-  // =================================
-  public static class Value{
-    public Class<?> clazz;
-    public Object value;
-    public boolean isArray;
-    public boolean isClass;
-
-    public Value(Class<?> clazz, Object value){
-      this.clazz = clazz;
-      this.value = value;
-      this.isArray = clazz.isArray();
-      this.isClass = value == null;
-    }
-
-    public String toString(){
-      return "class: " + clazz.toString() + ", value: " + (value != null ? value.toString() : "null");
-    }
-  }
-
-  static class MethodClass{
-    public String methodName;
-    public List<Value> params;
-
-    public MethodClass(String methodName, List<Value> params){
-      this.methodName = methodName;
-      this.params = params;
-    }
-  }
-
-  static class Invoke{
-    public String field;
-    public MethodClass method;
-
-    public Invoke(MethodClass m, String f){
-      field = f;
-      method = m;
-    }
-  }
+public class Parser {
 
   // =================================
   //        CLASS VARIABLES
   // =================================
   public static Map<String,Value> variables = new HashMap<String,Value>();
-  public static JavaInterpreter parser;
-  public static String mypackage;
-  public static List<String> packages;
-
-  // =================================
-  //              MAIN
-  // =================================
-  public static void initialize(Object thisObj, String packagename){
-    Value thisVal = new Value(thisObj.getClass(), thisObj);
-    mypackage = packagename;
-    packages = Arrays.asList(
-              mypackage + ".",
-              "java.lang.",
-              "java.util.",
-              "android.widget.",
-              "android.util.",
-              "android.app.",
-              "android.view.",
-              "android.content.",
-              "android.os."
-      );
-    variables.put("this", thisVal);
-    InputStream targetStream = new ByteArrayInputStream("".getBytes());
-    parser = new JavaInterpreter(targetStream );
-  }
-
-  public static void parseFunc(String s) throws ParseException {
-
-    InputStream targetStream = new ByteArrayInputStream(s.getBytes());
-    parser.ReInit(targetStream);
-    parser.Body();
-  }
 
   // =================================
   //        HELPER FUNCTIONS
@@ -105,96 +32,9 @@ public class JavaInterpreter {
     return variables.containsKey(var_name);
   }
 
-  public static Object getNewInstance(final Class<?> clazz, List<Value> constructorParameters) throws ParseException{
-    Class<?> [] parameterTypes = new Class[constructorParameters.size()];
-    Object [] parameters = new Object[constructorParameters.size()];
-    for(int i =  0; i < constructorParameters.size(); i++) {
-        parameterTypes[constructorParameters.size() - i - 1] = constructorParameters.get(i).clazz;
-        parameters[constructorParameters.size() - i - 1] = constructorParameters.get(i).value;
-    }
-    try{
-        //Constructor constructor = clazz.getConstructor(parameterTypes);
-        //return constructor.newInstance(parameters);
-        return ConstructorUtils.invokeConstructor(clazz, parameters);
-
-    }
-    catch(Exception e){
-        throw new ParseException("failed to create instance: " + e.getCause());
-    }
-  }
-
-  public static Value invokeStaticMethod(final Class<?> clazz, MethodClass m, Object o) throws ParseException{
-    List<Value> methodParameters = m.params;
-    Class<?> [] parameterTypes = new Class[methodParameters.size()];
-    Object [] parameters = new Object[methodParameters.size()];
-    for(int i =  0; i < methodParameters.size(); i++) {
-        parameterTypes[methodParameters.size() - i - 1] = methodParameters.get(i).clazz;
-        parameters[methodParameters.size() - i - 1] = methodParameters.get(i).value;
-        System.out.println("debug param : " + parameters[methodParameters.size() - i - 1]);
-        System.out.println("debug type : " + parameterTypes[methodParameters.size() - i - 1]);
-    }
-    try{
-      Object res = null;
-      if (o == null) {
-          res = MethodUtils.invokeStaticMethod(clazz, m.methodName, parameters);
-      }
-      else {
-          res = MethodUtils.invokeMethod(o, m.methodName, parameters);
-      }
-      if (res == null){
-        return null;
-      }
-      return new Value(res.getClass(), res);
-    }
-    catch(Exception e){
-        if(e == null || e.getMessage() == null){
-            return null;
-        }
-        Log.d("fetch","var "  + o);
-        Log.d("fetch","method "  + m.methodName);
-        for (Object p : parameters){
-          Log.d("fetch","param value: " + p +" "+ p.getClass().getSimpleName());
-        }
-        Log.d("fetch"," value of color : "+String.valueOf(MainActivity.mContext.getResources().getColor(R.color.colorAccent)));
-        Log.d("fetch",  clazz.getSimpleName());
-        for(Method meth : clazz.getMethods()){
-            if(meth.getName().equals(m.methodName)){
-                Log.d("fetch","============expected params:=============");
-                for(Class<?> paramType : meth.getParameterTypes()){
-                    Log.d("fetch",paramType.getSimpleName());
-                }
-                throw new ParseException("failed to invoke method: "+m.methodName+" on "+clazz.getSimpleName()+" \u005cn Wrong parameters");
-            }
-        }
-        throw new ParseException("failed to invoke method: " + m.methodName+" on "+clazz.getSimpleName()+" \u005cn No such method found");
-    }
-  }
-
-  public static Class<?> checkClass(Token className) throws ParseException{
-    Log.d("fetch","searching for class name "+className);
-    for (String pkg : packages){
-      Log.d("fetch", " checking pck "+pkg);
-      Class<?> clazz = classExists(pkg + className);
-      if (clazz != null ){
-        Log.d("fetch"," found class in pckg :"+pkg + clazz.getSimpleName());
-        return clazz;
-      }
-    }
-    throw new ParseException("Encountered '" + className + "' at column " + className.beginColumn + ". symbol doesnt exist");
-
-  }
-
-  static Class<?> classExists(String fullClassName) {
-      try {
-          return Class.forName(fullClassName);
-      } catch (ClassNotFoundException e) {
-          return null;
-      }
-  }
-
 }
 
-PARSER_END(JavaInterpreter)
+PARSER_END(Parser)
 
 SKIP :
 {

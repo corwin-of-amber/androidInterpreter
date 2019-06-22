@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">AInterpreter</string>
-    <string name="code_example">i = \"Something to toast about\";
+    <string name="code_example">hi = \"Something to toast about\";
         \nthis.findViewById(R.id.button).setTextColor(this.getResources().getColor(R.color.colorAccent));
-        \nToast.makeText(this, "hi", Toast.LENGTH_LONG).show();</string>
+        \nToast.makeText(this, hi, Toast.LENGTH_LONG).show();</string>
 </resources>

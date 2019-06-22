@@ -8,6 +8,8 @@ import android.widget.Button;
 import android.widget.EditText;
 
 
+import com.example.anny.myapplication.parser.ParseException;
+import com.example.anny.myapplication.parser.TokenMgrError;
 import com.example.anny.myapplication.server.myThread2;
 
 public class MainActivity extends AppCompatActivity {
